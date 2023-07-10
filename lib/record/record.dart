@@ -1,4 +1,5 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
 
@@ -10,6 +11,8 @@ class Records extends StatefulWidget {
 }
 
 class _RecordsState extends State<Records> {
+  /// variables to store the details concerning tyhe record
+  String recordDate = "";
   String recordTitle = "";
   String recordDescription = "";
 
@@ -135,7 +138,7 @@ class _RecordsState extends State<Records> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  recordTitle = value;
+                  recordDescription = value;
                 });
               },
               maxLines: 20,
@@ -167,7 +170,10 @@ class _RecordsState extends State<Records> {
         color: Colors.white,
       ),
       child: ElevatedButton(
-          onPressed: () {},
+          onPressed: () {
+            print(recordTitle);
+            print(recordDescription);
+          },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blueAccent,
               foregroundColor: Colors.white,
@@ -200,5 +206,12 @@ class _RecordsState extends State<Records> {
         ),
       ),
     );
+  }
+
+  /// method  to save the record details
+  void saveRecordData() async {
+    DatabaseReference ref = FirebaseDatabase.instance.ref("records");
+
+    await ref.push().set({"title": "", "description": ""});
   }
 }

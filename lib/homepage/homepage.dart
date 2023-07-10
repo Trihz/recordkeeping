@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/Account/account.dart';
+import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
 import 'package:recordkeeping/reports.dart';
 
@@ -214,21 +215,29 @@ class _HomePageState extends State<HomePage> {
                       color: Colors.black,
                       fontWeight: FontWeight.w300),
                 ),
-                Row(
-                  children: const [
-                    Text(
-                      "View",
-                      style: TextStyle(
-                          fontSize: 17,
-                          color: Colors.blueAccent,
-                          fontWeight: FontWeight.w400),
-                    ),
-                    SizedBox(width: 5),
-                    Icon(
-                      Icons.view_comfy_alt,
-                      color: Colors.blueAccent,
-                    ),
-                  ],
+                GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: ((context) => const AllRecords())));
+                  },
+                  child: Row(
+                    children: const [
+                      Text(
+                        "View",
+                        style: TextStyle(
+                            fontSize: 17,
+                            color: Colors.blueAccent,
+                            fontWeight: FontWeight.w400),
+                      ),
+                      SizedBox(width: 5),
+                      Icon(
+                        Icons.view_comfy_alt,
+                        color: Colors.blueAccent,
+                      ),
+                    ],
+                  ),
                 )
               ],
             ),
@@ -273,7 +282,7 @@ class _HomePageState extends State<HomePage> {
                                 style: TextStyle(
                                     fontSize: 16,
                                     color: Colors.black,
-                                    fontWeight: FontWeight.w500),
+                                    fontWeight: FontWeight.w400),
                               ),
                             ],
                           ),
