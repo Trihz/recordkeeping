@@ -1,5 +1,7 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
+import 'package:recordkeeping/reports/report_display.dart';
 
 class Reports extends StatefulWidget {
   const Reports({super.key});
@@ -9,6 +11,9 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
+  /// string variable to store the period of the report
+  String reportPeriod = "3 months";
+
   /// widget to show the top container
   Widget topContainer() {
     return Container(
@@ -27,10 +32,16 @@ class _ReportsState extends State<Reports> {
               ),
               GestureDetector(
                   onTap: () {
-                    Navigator.push(context,
-                        MaterialPageRoute(builder: ((context) => HomePage())));
+                    Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: ((context) => const HomePage())));
                   },
-                  child: const Icon(Icons.arrow_back_ios, color: Colors.black)),
+                  child: const Icon(
+                    Icons.arrow_back_ios,
+                    color: Colors.blueAccent,
+                    size: 20,
+                  )),
               SizedBox(
                 width: MediaQuery.of(context).size.height * 0.12,
               ),
@@ -86,7 +97,11 @@ class _ReportsState extends State<Reports> {
                         color: Colors.white,
                       ),
                       child: ElevatedButton(
-                          onPressed: (() {}),
+                          onPressed: (() {
+                            setState(() {
+                              reportPeriod = "3 months";
+                            });
+                          }),
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.blueAccent),
@@ -138,7 +153,11 @@ class _ReportsState extends State<Reports> {
                         color: Colors.white,
                       ),
                       child: ElevatedButton(
-                          onPressed: (() {}),
+                          onPressed: (() {
+                            setState(() {
+                              reportPeriod = "6 months";
+                            });
+                          }),
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.blueAccent),
@@ -190,7 +209,11 @@ class _ReportsState extends State<Reports> {
                         color: Colors.white,
                       ),
                       child: ElevatedButton(
-                          onPressed: (() {}),
+                          onPressed: (() {
+                            setState(() {
+                              reportPeriod = "12 months";
+                            });
+                          }),
                           style: ElevatedButton.styleFrom(
                               backgroundColor: Colors.white,
                               foregroundColor: Colors.blueAccent),
@@ -221,11 +244,11 @@ class _ReportsState extends State<Reports> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          const Align(
+          Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Reports",
-              style: TextStyle(
+              "Reports (${reportPeriod})",
+              style: const TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.w300,
                   fontSize: 18),
@@ -241,7 +264,7 @@ class _ReportsState extends State<Reports> {
               child: ListView.builder(
                   padding: const EdgeInsets.all(0.0),
                   scrollDirection: Axis.vertical,
-                  itemCount: 10,
+                  itemCount: 5,
                   itemBuilder: ((context, index) {
                     return Container(
                         height: MediaQuery.of(context).size.height * 0.07,
@@ -254,7 +277,7 @@ class _ReportsState extends State<Reports> {
                             color: Colors.white,
                             boxShadow: [
                               BoxShadow(
-                                color: Color.fromARGB(255, 0, 0, 0)
+                                color: const Color.fromARGB(255, 0, 0, 0)
                                     .withOpacity(0.1),
                                 spreadRadius: 1,
                                 blurRadius: 1,
@@ -265,16 +288,44 @@ class _ReportsState extends State<Reports> {
                             borderRadius:
                                 const BorderRadius.all(Radius.circular(5))),
                         child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: const [
-                            Text(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            const Text(
                               "(12/02/2023 - 1/05/2023)",
                               style: TextStyle(
                                   color: Colors.black,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 16),
+                                  fontWeight: FontWeight.w500,
+                                  fontSize: 15),
                             ),
-                            Icon(Icons.download),
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: ((context) => ReportDisplay(
+                                              contentOfReport: [
+                                                contentOfReport
+                                              ],
+                                            ))));
+                              },
+                              child: Row(
+                                children: const [
+                                  Icon(
+                                    Icons.view_timeline,
+                                    color: Colors.blueAccent,
+                                    size: 20,
+                                  ),
+                                  SizedBox(width: 5),
+                                  Text(
+                                    "VIEW",
+                                    style: TextStyle(
+                                        color: Colors.blueAccent,
+                                        fontWeight: FontWeight.w500,
+                                        fontSize: 13),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ],
                         ));
                   })),
@@ -283,6 +334,13 @@ class _ReportsState extends State<Reports> {
         ],
       ),
     );
+  }
+
+  /// initial function of the screen
+  @override
+  void initState() {
+    getReportContent();
+    super.initState();
   }
 
   @override
@@ -304,5 +362,23 @@ class _ReportsState extends State<Reports> {
         ),
       ),
     );
+  }
+
+  /// variable to store the content if the report being generated
+  List contentOfReport = [];
+
+  /// function to generate the report for the records
+  void getReportContent() {
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("records");
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      for (var data in event.snapshot.children) {
+        setState(() {
+          contentOfReport.add(data.value);
+        });
+      }
+
+      print(contentOfReport);
+    });
   }
 }

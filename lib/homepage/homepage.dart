@@ -1,10 +1,11 @@
 // ignore_for_file: non_constant_identifier_names
 
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/Account/account.dart';
 import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
-import 'package:recordkeeping/reports.dart';
+import 'package:recordkeeping/reports/reports.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -67,23 +68,33 @@ class _HomePageState extends State<HomePage> {
                   ],
                   borderRadius: const BorderRadius.all(Radius.circular(5))),
               child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
-                  Text(
-                    "RECORDS",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w300,
-                        fontSize: 16),
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      const Text(
+                        "RECORDS:",
+                        style: TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w300,
+                            fontSize: 16),
+                      ),
+                      const SizedBox(width: 10),
+                      Text(
+                        recordsCount,
+                        style: const TextStyle(
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                            fontSize: 18),
+                      ),
+                    ],
                   ),
-                  SizedBox(width: 10),
-                  Text(
-                    "20",
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w500,
-                        fontSize: 18),
-                  ),
+                  const Icon(
+                    Icons.refresh,
+                    color: Colors.blueAccent,
+                    size: 30,
+                  )
                 ],
               ),
             ),
@@ -247,7 +258,8 @@ class _HomePageState extends State<HomePage> {
             width: MediaQuery.of(context).size.width * 1,
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ListView.builder(
-                itemCount: 5,
+                itemCount: recordsTitles.length,
+                padding: const EdgeInsets.all(20),
                 scrollDirection: Axis.vertical,
                 itemBuilder: ((context, index) {
                   return Center(
@@ -273,13 +285,13 @@ class _HomePageState extends State<HomePage> {
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [
                           Row(
-                            children: const [
-                              Icon(Icons.view_comfy_alt,
+                            children: [
+                              const Icon(Icons.view_comfy_alt,
                                   color: Colors.blueAccent),
-                              SizedBox(width: 10),
+                              const SizedBox(width: 10),
                               Text(
-                                "Sell of products",
-                                style: TextStyle(
+                                recordsTitles[index]["title"],
+                                style: const TextStyle(
                                     fontSize: 16,
                                     color: Colors.black,
                                     fontWeight: FontWeight.w400),
@@ -486,6 +498,14 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  /// initial function of the screen
+  @override
+  void initState() {
+    getRecordTitles();
+    getNumberOfDays();
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -502,4 +522,33 @@ class _HomePageState extends State<HomePage> {
 
   /// List to store the elements of the scrolling dates
   List scrollingDates_Values = [1, 2, 3, 4, 5, 6, 7, 8, 9];
+
+  /// variable to store the records titles
+  List recordsTitles = [];
+
+  /// variable to store the total number if records present
+  String recordsCount = "";
+
+  /// function to get all the titles of the records
+  void getRecordTitles() {
+    int count = 0;
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("records");
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      for (var data in event.snapshot.children) {
+        setState(() {
+          recordsTitles.add(data.value);
+          count = count + 1;
+        });
+      }
+      setState(() {
+        recordsCount = count.toString();
+      });
+      print(recordsTitles[0]["title"]);
+      print(recordsTitles[1]["title"]);
+    });
+  }
+
+  /// function to get the number of days in the current month
+  void getNumberOfDays() {}
 }

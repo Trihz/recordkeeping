@@ -1,3 +1,4 @@
+import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
 
@@ -47,7 +48,7 @@ class _AllRecordsState extends State<AllRecords> {
   }
 
   /// widget to display a list of all the reports
-  Widget reportsDisplay() {
+  Widget recordsDisplay() {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
       width: MediaQuery.of(context).size.width * 0.95,
@@ -56,7 +57,7 @@ class _AllRecordsState extends State<AllRecords> {
       ),
       child: ListView.builder(
           scrollDirection: Axis.vertical,
-          itemCount: 10,
+          itemCount: recordsDetails.length,
           itemBuilder: ((context, index) {
             return Container(
               height: MediaQuery.of(context).size.height * 0.2,
@@ -82,15 +83,15 @@ class _AllRecordsState extends State<AllRecords> {
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: const [
+                      children: [
                         Text(
-                          "Selling of products",
-                          style: TextStyle(
+                          recordsDetails[index]["title"],
+                          style: const TextStyle(
                               fontSize: 17,
                               color: Colors.black,
                               fontWeight: FontWeight.w500),
                         ),
-                        Text(
+                        const Text(
                           "(12-01-2023)",
                           style: TextStyle(
                               fontSize: 16,
@@ -100,13 +101,16 @@ class _AllRecordsState extends State<AllRecords> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    const Text(
-                      "On January 12, 2023, am officially recording the sale of a TV to a client. This transaction marks an important event in which a TV was successfully sold and delivered. The client, [Client Name], expressed interest in purchasing a TV, and after thorough discussion and agreement on the terms, the sale was finalized.",
-                      style: TextStyle(
-                          wordSpacing: 2,
-                          fontSize: 15,
-                          color: Colors.black,
-                          fontWeight: FontWeight.w300),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        recordsDetails[index]["description"],
+                        style: const TextStyle(
+                            wordSpacing: 2,
+                            fontSize: 15,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w300),
+                      ),
                     ),
                   ],
                 ),
@@ -114,6 +118,13 @@ class _AllRecordsState extends State<AllRecords> {
             );
           })),
     );
+  }
+
+  /// initial function of the screen
+  @override
+  void initState() {
+    getAllRecords();
+    super.initState();
   }
 
   @override
@@ -130,10 +141,28 @@ class _AllRecordsState extends State<AllRecords> {
           children: [
             SizedBox(height: MediaQuery.of(context).size.height * 0.08),
             topContainer(),
-            reportsDisplay()
+            recordsDisplay()
           ],
         ),
       ),
     );
+  }
+
+  /// variables to store the details of all the records
+  List recordsDetails = [];
+
+  /// function to return the details of all the records
+  void getAllRecords() {
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("records");
+    databaseReference.onValue.listen((DatabaseEvent event) {
+      for (var data in event.snapshot.children) {
+        setState(() {
+          recordsDetails.add(data.value);
+        });
+      }
+      print(recordsDetails[0]["title"]);
+      print(recordsDetails[0]["description"]);
+    });
   }
 }

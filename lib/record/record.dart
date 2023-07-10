@@ -122,8 +122,20 @@ class _RecordsState extends State<Records> {
                     TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.black,
-                    width: 1.0,
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
                   ),
                 ),
               ),
@@ -149,8 +161,20 @@ class _RecordsState extends State<Records> {
                     TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Colors.black,
-                    width: 1.0,
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
                   ),
                 ),
               ),
@@ -173,6 +197,7 @@ class _RecordsState extends State<Records> {
           onPressed: () {
             print(recordTitle);
             print(recordDescription);
+            saveRecordsData();
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blueAccent,
@@ -209,9 +234,11 @@ class _RecordsState extends State<Records> {
   }
 
   /// method  to save the record details
-  void saveRecordData() async {
+  void saveRecordsData() async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("records");
 
-    await ref.push().set({"title": "", "description": ""});
+    await ref
+        .push()
+        .set({"title": recordTitle, "description": recordDescription});
   }
 }
