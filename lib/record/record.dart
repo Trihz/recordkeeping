@@ -1,7 +1,10 @@
+// ignore_for_file: avoid_print
+
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
+import 'package:intl/intl.dart';
 
 class Records extends StatefulWidget {
   const Records({super.key});
@@ -12,7 +15,7 @@ class Records extends StatefulWidget {
 
 class _RecordsState extends State<Records> {
   /// variables to store the details concerning tyhe record
-  String recordDate = "";
+  String recordDate = "SELECT DATE";
   String recordTitle = "";
   String recordDescription = "";
 
@@ -61,6 +64,10 @@ class _RecordsState extends State<Records> {
               child: CalendarDatePicker2(
                 config: CalendarDatePicker2Config(),
                 value: [],
+                onValueChanged: (value) {
+                  formatDate(value[0].toString());
+                  print(value);
+                },
               )),
         ],
       ),
@@ -93,10 +100,10 @@ class _RecordsState extends State<Records> {
                 ),
               ],
             ),
-            child: const Center(
+            child: Center(
               child: Text(
-                "SELECT DATE",
-                style: TextStyle(
+                recordDate,
+                style: const TextStyle(
                     fontSize: 15,
                     color: Colors.black,
                     fontWeight: FontWeight.w600),
@@ -188,22 +195,20 @@ class _RecordsState extends State<Records> {
   /// show record button
   Widget recordButton() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.04,
+      height: MediaQuery.of(context).size.height * 0.05,
       width: MediaQuery.of(context).size.width * 0.4,
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
       child: ElevatedButton(
           onPressed: () {
-            print(recordTitle);
-            print(recordDescription);
-            saveRecordsData();
+            checkEntryOfDetails();
           },
           style: ElevatedButton.styleFrom(
               backgroundColor: Colors.blueAccent,
               foregroundColor: Colors.white,
               shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20))),
+                  borderRadius: BorderRadius.circular(5))),
           child: const Text(
             "SAVE",
             style: TextStyle(
@@ -237,8 +242,67 @@ class _RecordsState extends State<Records> {
   void saveRecordsData() async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("records");
 
-    await ref
-        .push()
-        .set({"title": recordTitle, "description": recordDescription});
+    await ref.push().set({
+      "date": recordDate,
+      "title": recordTitle,
+      "description": recordDescription
+    });
+  }
+
+  /// function to format the datetime object
+  void formatDate(String dateOuput) {
+    DateTime dateTime = DateTime.parse(dateOuput);
+    String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+
+    setState(() {
+      recordDate = formattedDate;
+    });
+    print("Report date: $recordDate");
+  }
+
+  /// alert dialog to indicate that the record has been saved successfully
+  void success(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+              height: MediaQuery.of(context).size.height * 0.2,
+              width: MediaQuery.of(context).size.width * 1,
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: const [
+                  Text(
+                    "Record has been saved successfully",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 16),
+                  ),
+                  Icon(
+                    Icons.check_circle_outline_rounded,
+                    color: Colors.blueAccent,
+                    size: 50,
+                  )
+                ],
+              )),
+        );
+      },
+    );
+  }
+
+  /// function to check whether all the details have been entered as required
+  void checkEntryOfDetails() {
+    if (recordDate == "SELECT DATE" ||
+        recordTitle.isEmpty ||
+        recordDescription.isEmpty) {
+      print("Please enter missing details");
+    } else {
+      saveRecordsData();
+      success(context);
+    }
   }
 }

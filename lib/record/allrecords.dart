@@ -23,6 +23,9 @@ class _AllRecordsState extends State<AllRecords> {
           const SizedBox(
             width: 5,
           ),
+          const SizedBox(
+            width: 10,
+          ),
           GestureDetector(
               onTap: () {
                 Navigator.push(
@@ -30,10 +33,13 @@ class _AllRecordsState extends State<AllRecords> {
                     MaterialPageRoute(
                         builder: ((context) => const HomePage())));
               },
-              child:
-                  const Icon(Icons.arrow_back_ios, color: Colors.blueAccent)),
+              child: const Icon(
+                Icons.arrow_back_ios,
+                color: Colors.blueAccent,
+                size: 20,
+              )),
           SizedBox(
-            width: MediaQuery.of(context).size.height * 0.12,
+            width: MediaQuery.of(context).size.height * 0.15,
           ),
           const Text(
             "All Records",
@@ -57,14 +63,14 @@ class _AllRecordsState extends State<AllRecords> {
       ),
       child: ListView.builder(
           scrollDirection: Axis.vertical,
+          padding: const EdgeInsets.all(10),
           itemCount: recordsDetails.length,
           itemBuilder: ((context, index) {
             return Container(
-              height: MediaQuery.of(context).size.height * 0.2,
               width: MediaQuery.of(context).size.width * 1,
               margin: const EdgeInsets.only(bottom: 30, left: 10, right: 10),
               padding: const EdgeInsets.only(
-                  left: 10, right: 10, top: 10, bottom: 10),
+                  left: 10, right: 10, top: 10, bottom: 15),
               decoration: BoxDecoration(
                 color: Colors.white,
                 boxShadow: [
@@ -91,9 +97,9 @@ class _AllRecordsState extends State<AllRecords> {
                               color: Colors.black,
                               fontWeight: FontWeight.w500),
                         ),
-                        const Text(
-                          "(12-01-2023)",
-                          style: TextStyle(
+                        Text(
+                          "( ${recordsDetails[index]["date"]} )",
+                          style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
                               fontWeight: FontWeight.w400),
