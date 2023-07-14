@@ -4,51 +4,38 @@ import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 
 class AllRecords extends StatefulWidget {
-  String userName = "";
-  AllRecords({super.key, required this.userName});
+  String userGmail = "";
+  AllRecords({super.key, required this.userGmail});
 
   @override
   State<AllRecords> createState() => _AllRecordsState();
 }
 
 class _AllRecordsState extends State<AllRecords> {
+  /// variable to store the gradient color for containers
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
   /// widget to show the top container
   Widget topContainer() {
     return Container(
       height: MediaQuery.of(context).size.height * 0.05,
-      width: MediaQuery.of(context).size.width * 0.95,
+      width: MediaQuery.of(context).size.width * 0.85,
       decoration: const BoxDecoration(
         color: Colors.white,
       ),
       child: Row(
-        children: [
-          const SizedBox(
-            width: 5,
-          ),
-          const SizedBox(
-            width: 10,
-          ),
-          /*GestureDetector(
-              onTap: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: ((context) => const HomePage())));
-              },
-              child: const Icon(
-                Icons.arrow_back_ios,
-                color: Colors.blueAccent,
-                size: 20,
-              )),*/
-          SizedBox(
-            width: MediaQuery.of(context).size.height * 0.15,
-          ),
-          const Text(
+        children: const [
+          Text(
             "All Records",
             style: TextStyle(
-                color: Colors.orange,
-                fontWeight: FontWeight.w400,
-                fontSize: 19),
+                color: Colors.black, fontWeight: FontWeight.w400, fontSize: 19),
           ),
         ],
       ),
@@ -70,15 +57,16 @@ class _AllRecordsState extends State<AllRecords> {
           itemBuilder: ((context, index) {
             return Container(
               width: MediaQuery.of(context).size.width * 1,
-              margin: const EdgeInsets.only(bottom: 30, left: 10, right: 10),
+              margin: const EdgeInsets.only(bottom: 20, left: 10, right: 10),
               padding: const EdgeInsets.only(
-                  left: 10, right: 10, top: 10, bottom: 15),
+                  left: 10, right: 10, top: 15, bottom: 15),
               decoration: BoxDecoration(
                 color: Colors.white,
+                borderRadius: const BorderRadius.all(Radius.circular(5)),
                 boxShadow: [
                   BoxShadow(
-                    color:
-                        const Color.fromARGB(255, 99, 99, 99).withOpacity(0.3),
+                    color: const Color.fromARGB(255, 129, 129, 129)
+                        .withOpacity(0.3),
                     spreadRadius: 1,
                     blurRadius: 1,
                     offset: const Offset(0, 1), // changes position of shadow
@@ -97,14 +85,14 @@ class _AllRecordsState extends State<AllRecords> {
                           style: const TextStyle(
                               fontSize: 17,
                               color: Colors.black,
-                              fontWeight: FontWeight.w500),
+                              fontWeight: FontWeight.w300),
                         ),
                         Text(
                           "( ${recordsDetails[index]["date"]} )",
                           style: const TextStyle(
                               fontSize: 16,
                               color: Colors.black,
-                              fontWeight: FontWeight.w400),
+                              fontWeight: FontWeight.w300),
                         ),
                       ],
                     ),
@@ -164,7 +152,7 @@ class _AllRecordsState extends State<AllRecords> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("info")
-        .child(widget.userName)
+        .child(removeSpecialCharacters(widget.userGmail))
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
@@ -175,5 +163,11 @@ class _AllRecordsState extends State<AllRecords> {
       print(recordsDetails[0]["title"]);
       print(recordsDetails[0]["description"]);
     });
+  }
+
+  /// Remove special characters
+  String removeSpecialCharacters(String input) {
+    final regex = RegExp(r'[^\w\s]');
+    return input.replaceAll(regex, '');
   }
 }

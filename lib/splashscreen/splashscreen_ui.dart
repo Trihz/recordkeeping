@@ -17,7 +17,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _timer = Timer(const Duration(seconds: 5), () {
+    _timer = Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Authentication()),
@@ -53,7 +53,7 @@ class _SplashScreenState extends State<SplashScreen> {
                       fontSize: 30.0,
                       fontFamily: 'Horizon',
                       fontWeight: FontWeight.w900),
-                  colors: [Colors.purple, Colors.orange, Colors.blue],
+                  colors: [Colors.orange, Colors.purple],
                 ),
               ],
               isRepeatingAnimation: true,

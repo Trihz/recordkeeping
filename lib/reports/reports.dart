@@ -7,8 +7,8 @@ import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/reports/report_display.dart';
 
 class Reports extends StatefulWidget {
-  String userName = "";
-  Reports({super.key, required this.userName});
+  String userGmail = "";
+  Reports({super.key, required this.userGmail});
 
   @override
   State<Reports> createState() => _ReportsState();
@@ -258,20 +258,20 @@ class _ReportsState extends State<Reports> {
                             ),
                             GestureDetector(
                               onTap: () {
-                                Navigator.push(
+                                /*Navigator.push(
                                     context,
                                     MaterialPageRoute(
                                         builder: ((context) => ReportDisplay(
                                               contentOfReport: [
                                                 contentOfReport
                                               ],
-                                            ))));
+                                            ))));*/
                               },
                               child: Row(
                                 children: [
                                   GradientIcon(
                                       Icons.view_timeline, 30, gradient),
-                                  SizedBox(width: 5),
+                                  const SizedBox(width: 5),
                                   const Text(
                                     "VIEW",
                                     style: TextStyle(
@@ -325,7 +325,7 @@ class _ReportsState extends State<Reports> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("info")
-        .child(widget.userName)
+        .child(removeSpecialCharacters(widget.userGmail))
         .child("reports");
     databaseReference.onValue.listen((event) {
       for (var data in event.snapshot.children) {
@@ -348,5 +348,11 @@ class _ReportsState extends State<Reports> {
       print(count6);
       print(count12);
     });
+  }
+
+  /// Remove special characters
+  String removeSpecialCharacters(String input) {
+    final regex = RegExp(r'[^\w\s]');
+    return input.replaceAll(regex, '');
   }
 }

@@ -306,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: ((context) => AllRecords(
-                                  userName: widget.userGmail,
+                                  userGmail: widget.userGmail,
                                 ))));
                   },
                   child: Row(
@@ -342,7 +342,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                                 builder: ((context) => AllRecords(
-                                      userName: widget.userGmail,
+                                      userGmail: widget.userGmail,
                                     ))));
                       },
                       child: Container(
@@ -500,7 +500,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: ((context) => Reports(
-                            userName: widget.userGmail,
+                            userGmail: widget.userGmail,
                           ))));
             },
             child: Container(
@@ -662,6 +662,7 @@ class _HomePageState extends State<HomePage> {
     });
   }
 
+  /// Remove special characters
   String removeSpecialCharacters(String input) {
     final regex = RegExp(r'[^\w\s]');
     return input.replaceAll(regex, '');
