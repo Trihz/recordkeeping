@@ -25,6 +25,7 @@ class _SignUpState extends State<SignUp> {
   /// variables to store the user details
   String userName = "";
   String userGmail = "";
+  String sanitized_UserGmail = "";
   String userPassword = "";
   String userPassword2 = "";
 
@@ -111,6 +112,7 @@ class _SignUpState extends State<SignUp> {
               onChanged: (value) {
                 setState(() {
                   userGmail = value;
+                  sanitized_UserGmail = removeSpecialCharacters(value);
                 });
               },
               decoration: const InputDecoration(
@@ -294,6 +296,11 @@ class _SignUpState extends State<SignUp> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
@@ -358,14 +365,14 @@ class _SignUpState extends State<SignUp> {
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.white,
-                          foregroundColor: Colors.blueAccent,
+                          foregroundColor: Colors.orange,
                           shape: const RoundedRectangleBorder(
                               borderRadius:
                                   BorderRadius.all(Radius.circular(5)))),
                       child: const Text(
                         "LOGIN",
                         style: TextStyle(
-                            fontWeight: FontWeight.w400, fontSize: 15),
+                            fontWeight: FontWeight.w900, fontSize: 15),
                       ),
                     ),
                   ),
@@ -380,9 +387,11 @@ class _SignUpState extends State<SignUp> {
   void registerUser() async {
     DatabaseReference ref = FirebaseDatabase.instance.ref("users");
 
-    await ref
-        .child(userName)
-        .set({"username": userName, "userpassword": userPassword});
+    await ref.child(sanitized_UserGmail).set({
+      "username": userName,
+      "usergmail": userGmail,
+      "userpassword": userPassword
+    });
   }
 
   /// check whether all the details have been entered
@@ -410,23 +419,27 @@ class _SignUpState extends State<SignUp> {
   /// signup errors snackbar
   void showSnackBar(String snackbarMessage) {
     final snackBar = SnackBar(
-      backgroundColor: Colors.blueAccent,
       padding: const EdgeInsets.all(0),
       duration: const Duration(milliseconds: 600),
       content: Container(
         height: MediaQuery.of(context).size.height * 0.06,
         width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(color: Colors.transparent),
+        decoration: BoxDecoration(gradient: gradient),
         child: Center(
           child: Text(
             snackbarMessage,
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w400, fontSize: 18),
+                color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18),
           ),
         ),
       ),
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  String removeSpecialCharacters(String input) {
+    final regex = RegExp(r'[^\w\s]');
+    return input.replaceAll(regex, '');
   }
 }

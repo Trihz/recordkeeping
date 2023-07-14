@@ -10,8 +10,8 @@ import 'package:recordkeeping/record/record.dart';
 import 'package:recordkeeping/reports/reports.dart';
 
 class HomePage extends StatefulWidget {
-  String userName = "";
-  HomePage({super.key, required this.userName});
+  String userGmail = "";
+  HomePage({super.key, required this.userGmail});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -27,6 +27,9 @@ class _HomePageState extends State<HomePage> {
       Colors.purple,
     ],
   );
+
+  /// String varaible for storing the fetched username
+  String userName = "";
 
   /// variable to store default period for the manual report request
   String selectedOption = "1 DAY";
@@ -51,6 +54,9 @@ class _HomePageState extends State<HomePage> {
   String reportType_ToDatabase = "";
   String reportPeriod_ToDatabase = "";
   List reportContent_ToDatabase = [];
+
+  /// string variable to store the date clicked
+  String clickedDate = "";
 
   /// widget to display the top contiainer
   Widget topContainer() {
@@ -126,15 +132,10 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                   GestureDetector(
-                    onTap: () {
-                      getRecordTitles();
-                    },
-                    child: const Icon(
-                      Icons.refresh,
-                      color: Colors.blueAccent,
-                      size: 30,
-                    ),
-                  )
+                      onTap: () {
+                        getRecordTitles();
+                      },
+                      child: GradientIcon(Icons.refresh, 30, gradient))
                 ],
               ),
             ),
@@ -176,10 +177,10 @@ class _HomePageState extends State<HomePage> {
             children: [
               GestureDetector(
                 onTap: () {
-                  Navigator.push(
+                  /*Navigator.push(
                       context,
                       MaterialPageRoute(
-                          builder: ((context) => const AccountUI())));
+                          builder: ((context) => const AccountUI())));*/
                 },
                 child: Container(
                     width: 30,
@@ -191,7 +192,7 @@ class _HomePageState extends State<HomePage> {
                     child: const Icon(Icons.person)),
               ),
               Text(
-                widget.userName,
+                userName,
                 style: const TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.w400,
@@ -219,6 +220,16 @@ class _HomePageState extends State<HomePage> {
                 showSnackBar();
                 getRecordsBasedOnDate(
                     (index + 1).toString(), currentMonth, currentYear);
+                setState(() {
+                  if (currentMonth.length == 1) {
+                    currentMonth = "0$currentMonth";
+                  }
+                  if ((index + 1).toString().length == 1) {
+                    clickedDate = "0${index + 1}-$currentMonth-$currentYear";
+                  } else {
+                    clickedDate = "${index + 1}-$currentMonth-$currentYear";
+                  }
+                });
                 print(index + 1);
               },
               child: Container(
@@ -295,7 +306,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: ((context) => AllRecords(
-                                  userName: widget.userName,
+                                  userName: widget.userGmail,
                                 ))));
                   },
                   child: Row(
@@ -331,7 +342,7 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                                 builder: ((context) => AllRecords(
-                                      userName: widget.userName,
+                                      userName: widget.userGmail,
                                     ))));
                       },
                       child: Container(
@@ -357,8 +368,8 @@ class _HomePageState extends State<HomePage> {
                           children: [
                             Row(
                               children: [
-                                const Icon(Icons.view_comfy_alt,
-                                    color: Colors.blueAccent),
+                                GradientIcon(
+                                    Icons.view_comfy_alt, 25, gradient),
                                 const SizedBox(width: 10),
                                 Text(
                                   recordsTitles[index]["title"],
@@ -489,7 +500,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: ((context) => Reports(
-                            userName: widget.userName,
+                            userName: widget.userGmail,
                           ))));
             },
             child: Container(
@@ -540,7 +551,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
                 builder: ((context) => Records(
-                      userName: widget.userName,
+                      userGmail: widget.userGmail,
                     ))));
       },
       child: Container(
@@ -581,9 +592,8 @@ class _HomePageState extends State<HomePage> {
   /// initial function of the screen
   @override
   void initState() {
-    print("****************************************************************");
-    print(widget.userName);
-    print("****************************************************************");
+    /// fetch username
+    fetchUserName();
 
     /// current month and year
     getCurrentMonthYear();
@@ -598,8 +608,6 @@ class _HomePageState extends State<HomePage> {
     evaluateSixMonthsPeriod();
     evaluateTwelveMonthsPeriod();
     getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
-    //getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
-    //getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
 
     super.initState();
   }
@@ -640,6 +648,25 @@ class _HomePageState extends State<HomePage> {
   String currentMonth = "";
   String currentYear = "";
 
+  /// Get username
+  void fetchUserName() {
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("users")
+        .child(removeSpecialCharacters(widget.userGmail))
+        .child("username");
+    databaseReference.onValue.listen((event) {
+      setState(() {
+        userName = event.snapshot.value.toString();
+      });
+    });
+  }
+
+  String removeSpecialCharacters(String input) {
+    final regex = RegExp(r'[^\w\s]');
+    return input.replaceAll(regex, '');
+  }
+
   /// function to get all the titles of the records
   void getRecordTitles() {
     int count = 0;
@@ -647,7 +674,7 @@ class _HomePageState extends State<HomePage> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("info")
-        .child(widget.userName)
+        .child(removeSpecialCharacters(widget.userGmail))
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
@@ -720,7 +747,7 @@ class _HomePageState extends State<HomePage> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("info")
-        .child(widget.userName)
+        .child(removeSpecialCharacters(widget.userGmail))
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
@@ -756,9 +783,10 @@ class _HomePageState extends State<HomePage> {
       content: Container(
         height: MediaQuery.of(context).size.height * 0.4,
         width: MediaQuery.of(context).size.width * 1,
+        margin: const EdgeInsets.only(left: 5, bottom: 5),
         decoration: BoxDecoration(
-          gradient: gradient,
-        ),
+            gradient: gradient,
+            borderRadius: const BorderRadius.all(Radius.circular(5))),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
@@ -769,13 +797,13 @@ class _HomePageState extends State<HomePage> {
               decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: const Center(
+              child: Center(
                 child: Text(
-                  "(10-04-2022)",
-                  style: TextStyle(
+                  clickedDate,
+                  style: const TextStyle(
                       color: Colors.black,
                       fontWeight: FontWeight.w500,
-                      fontSize: 18),
+                      fontSize: 16),
                 ),
               ),
             ),
@@ -862,7 +890,7 @@ class _HomePageState extends State<HomePage> {
   /// THREE months
   void getReportContent_ThreeMonths(String startDate, String endDate) async {
     DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("info").child(widget.userName);
+        FirebaseDatabase.instance.ref().child("info").child(widget.userGmail);
     databaseReference
         .child("records")
         .orderByChild('date')
@@ -892,8 +920,10 @@ class _HomePageState extends State<HomePage> {
 
   /// SIX months
   void getReportContent_SixMonths(String startDate, String endDate) async {
-    Query databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    Query databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("records")
+        .child(widget.userGmail);
     databaseReference
         .orderByChild('date')
         .startAt(startDate)
@@ -910,8 +940,10 @@ class _HomePageState extends State<HomePage> {
 
   /// TWELVE months
   void getReportContent_TwelveMonths(String startDate, String endDate) async {
-    Query databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    Query databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("records")
+        .child(widget.userGmail);
     databaseReference
         .orderByChild('date')
         .startAt(startDate)

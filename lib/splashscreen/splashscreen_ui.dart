@@ -43,19 +43,22 @@ class _SplashScreenState extends State<SplashScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: Center(
-            child: DefaultTextStyle(
-              style: const TextStyle(
-                  fontSize: 30,
-                  color: Colors.blueAccent,
-                  fontWeight: FontWeight.w300),
-              child: AnimatedTextKit(
-                animatedTexts: [
-                  WavyAnimatedText('Record Keeper'),
-                ],
-                isRepeatingAnimation: true,
-              ),
+              child: SizedBox(
+            width: 250.0,
+            child: AnimatedTextKit(
+              animatedTexts: [
+                ColorizeAnimatedText(
+                  'RECORD KEEPER',
+                  textStyle: const TextStyle(
+                      fontSize: 30.0,
+                      fontFamily: 'Horizon',
+                      fontWeight: FontWeight.w900),
+                  colors: [Colors.purple, Colors.orange, Colors.blue],
+                ),
+              ],
+              isRepeatingAnimation: true,
             ),
-          ),
+          )),
         ),
       ),
     );

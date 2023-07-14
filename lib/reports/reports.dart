@@ -3,6 +3,7 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/reports/report_display.dart';
 
 class Reports extends StatefulWidget {
@@ -267,17 +268,14 @@ class _ReportsState extends State<Reports> {
                                             ))));
                               },
                               child: Row(
-                                children: const [
-                                  Icon(
-                                    Icons.view_timeline,
-                                    color: Colors.blueAccent,
-                                    size: 20,
-                                  ),
+                                children: [
+                                  GradientIcon(
+                                      Icons.view_timeline, 30, gradient),
                                   SizedBox(width: 5),
-                                  Text(
+                                  const Text(
                                     "VIEW",
                                     style: TextStyle(
-                                        color: Colors.blueAccent,
+                                        color: Colors.black,
                                         fontWeight: FontWeight.w500,
                                         fontSize: 13),
                                   ),

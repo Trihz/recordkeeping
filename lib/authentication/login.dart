@@ -68,13 +68,13 @@ class _AuthenticationState extends State<Authentication> {
               },
               decoration: const InputDecoration(
                 prefixIcon: Icon(
-                  Icons.person,
+                  Icons.mail,
                   size: 20,
                   color: Colors.white,
                 ),
                 isCollapsed: true,
                 iconColor: Colors.white,
-                hintText: "Name",
+                hintText: "Gmail",
                 contentPadding: EdgeInsets.all(10.0),
                 hintStyle:
                     TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
@@ -240,7 +240,7 @@ class _AuthenticationState extends State<Authentication> {
       DatabaseReference databaseReference = FirebaseDatabase.instance
           .ref()
           .child("users")
-          .child(userName)
+          .child(removeSpecialCharacters(userName))
           .child("userpassword");
 
       databaseReference.onValue.listen((event) {
@@ -257,7 +257,7 @@ class _AuthenticationState extends State<Authentication> {
               context,
               MaterialPageRoute(
                   builder: ((context) => HomePage(
-                        userName: userName,
+                        userGmail: userName,
                       ))),
               (route) => false);
         } else {
@@ -267,21 +267,25 @@ class _AuthenticationState extends State<Authentication> {
     }
   }
 
+  String removeSpecialCharacters(String input) {
+    final regex = RegExp(r'[^\w\s]');
+    return input.replaceAll(regex, '');
+  }
+
   /// login errors snackbar
   void showSnackBar(String snackbarMessage) {
     final snackBar = SnackBar(
-      backgroundColor: Colors.blueAccent,
       padding: const EdgeInsets.all(0),
       duration: const Duration(milliseconds: 600),
       content: Container(
         height: MediaQuery.of(context).size.height * 0.06,
         width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(color: Colors.transparent),
+        decoration: BoxDecoration(gradient: gradient),
         child: Center(
           child: Text(
             snackbarMessage,
             style: const TextStyle(
-                color: Colors.black, fontWeight: FontWeight.w400, fontSize: 18),
+                color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18),
           ),
         ),
       ),

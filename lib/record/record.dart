@@ -3,12 +3,13 @@
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
 import 'package:intl/intl.dart';
 
 class Records extends StatefulWidget {
-  String userName = "";
-  Records({super.key, required this.userName});
+  String userGmail = "";
+  Records({super.key, required this.userGmail});
 
   @override
   State<Records> createState() => _RecordsState();
@@ -37,7 +38,7 @@ class _RecordsState extends State<Records> {
       width: MediaQuery.of(context).size.width * 0.99,
       decoration: BoxDecoration(
           gradient: gradient,
-          borderRadius: BorderRadius.only(
+          borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10))),
       child: Column(
@@ -240,9 +241,6 @@ class _RecordsState extends State<Records> {
 
   @override
   void initState() {
-    print("****************************************************************");
-    print(widget.userName);
-    print("****************************************************************");
     super.initState();
   }
 
@@ -270,7 +268,7 @@ class _RecordsState extends State<Records> {
   void saveRecordsData() async {
     DatabaseReference ref = FirebaseDatabase.instance
         .ref("info")
-        .child(widget.userName)
+        .child(removeSpecialCharacters(widget.userGmail))
         .child("records");
 
     await ref.child(recordDate).set({
@@ -278,6 +276,11 @@ class _RecordsState extends State<Records> {
       "title": recordTitle,
       "description": recordDescription
     });
+  }
+
+  String removeSpecialCharacters(String input) {
+    final regex = RegExp(r'[^\w\s]');
+    return input.replaceAll(regex, '');
   }
 
   /// function to format the datetime object
@@ -305,19 +308,15 @@ class _RecordsState extends State<Records> {
                   borderRadius: BorderRadius.all(Radius.circular(10))),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
-                  Text(
+                children: [
+                  const Text(
                     "Record has been saved successfully",
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
                         fontSize: 16),
                   ),
-                  Icon(
-                    Icons.check_circle_outline_rounded,
-                    color: Colors.blueAccent,
-                    size: 50,
-                  )
+                  GradientIcon(Icons.check_circle_outline_rounded, 50, gradient)
                 ],
               )),
         );
@@ -330,10 +329,33 @@ class _RecordsState extends State<Records> {
     if (recordDate == "SELECT DATE" ||
         recordTitle.isEmpty ||
         recordDescription.isEmpty) {
-      print("Please enter missing details");
+      showSnackBar("Please enter all details");
     } else {
       saveRecordsData();
       success(context);
     }
+  }
+
+  /// record data errors snackbar
+  void showSnackBar(String snackbarMessage) {
+    final snackBar = SnackBar(
+      backgroundColor: Colors.white,
+      padding: const EdgeInsets.all(0),
+      duration: const Duration(milliseconds: 600),
+      content: Container(
+        height: MediaQuery.of(context).size.height * 0.1,
+        width: MediaQuery.of(context).size.width * 1,
+        decoration: BoxDecoration(gradient: gradient),
+        child: Center(
+          child: Text(
+            snackbarMessage,
+            style: const TextStyle(
+                color: Colors.white, fontWeight: FontWeight.w400, fontSize: 18),
+          ),
+        ),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
