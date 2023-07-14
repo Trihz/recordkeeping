@@ -1,3 +1,5 @@
+// ignore_for_file: avoid_print
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/authentication/login.dart';
@@ -12,12 +14,14 @@ class SignUp extends StatefulWidget {
 class _SignUpState extends State<SignUp> {
   /// variables to store the user details
   String userName = "";
+  String userGmail = "";
   String userPassword = "";
+  String userPassword2 = "";
 
   /// LOGIN widget
   Widget displaySignUp() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.45,
+      height: MediaQuery.of(context).size.height * 0.55,
       width: MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
@@ -38,7 +42,7 @@ class _SignUpState extends State<SignUp> {
           const Text(
             "Sign up",
             style: TextStyle(
-                color: Colors.white, fontWeight: FontWeight.w600, fontSize: 22),
+                color: Colors.white, fontWeight: FontWeight.w400, fontSize: 22),
           ),
           Container(
             height: MediaQuery.of(context).size.height * 0.05,
@@ -62,8 +66,10 @@ class _SignUpState extends State<SignUp> {
                 iconColor: Colors.white,
                 hintText: "Name",
                 contentPadding: EdgeInsets.all(10.0),
-                hintStyle:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+                hintStyle: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.w200,
+                ),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: Colors.white,
@@ -94,7 +100,7 @@ class _SignUpState extends State<SignUp> {
             child: TextField(
               onChanged: (value) {
                 setState(() {
-                  userPassword = value;
+                  userGmail = value;
                 });
               },
               decoration: const InputDecoration(
@@ -108,7 +114,7 @@ class _SignUpState extends State<SignUp> {
                 hintText: "Gmail",
                 contentPadding: EdgeInsets.all(10.0),
                 hintStyle:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.w200),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: Colors.white,
@@ -153,7 +159,52 @@ class _SignUpState extends State<SignUp> {
                 hintText: "Password",
                 contentPadding: EdgeInsets.all(10.0),
                 hintStyle:
-                    TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.w200),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Colors.white,
+                    width: 1.0,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.05,
+            width: MediaQuery.of(context).size.width * 0.7,
+            decoration: const BoxDecoration(
+              color: Colors.transparent,
+            ),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  userPassword2 = value;
+                });
+              },
+              decoration: const InputDecoration(
+                prefixIcon: Icon(
+                  Icons.password,
+                  size: 20,
+                  color: Colors.white,
+                ),
+                isCollapsed: true,
+                iconColor: Colors.white,
+                hintText: "Confirm password",
+                contentPadding: EdgeInsets.all(10.0),
+                hintStyle:
+                    TextStyle(color: Colors.white, fontWeight: FontWeight.w200),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
                     color: Colors.white,
@@ -212,8 +263,7 @@ class _SignUpState extends State<SignUp> {
                 ),
                 child: ElevatedButton(
                   onPressed: () {
-                    registerUser();
-                    success(context);
+                    checkDetails();
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
@@ -323,5 +373,42 @@ class _SignUpState extends State<SignUp> {
     await ref
         .child(userName)
         .set({"username": userName, "userpassword": userPassword});
+  }
+
+  /// check whether all the details have been entered
+  void checkDetails() {
+    if (userName.isEmpty ||
+        userGmail.isEmpty ||
+        userPassword.isEmpty ||
+        userPassword2.isEmpty) {
+      print("Enter all the details");
+      showSnackBar("Please enter all the details");
+    } else {
+      registerUser();
+      success(context);
+    }
+  }
+
+  /// signup errors snackba
+  void showSnackBar(String snackbarMessage) {
+    final snackBar = SnackBar(
+      backgroundColor: Colors.blueAccent,
+      padding: const EdgeInsets.all(0),
+      duration: const Duration(milliseconds: 600),
+      content: Container(
+        height: MediaQuery.of(context).size.height * 0.06,
+        width: MediaQuery.of(context).size.width * 1,
+        decoration: const BoxDecoration(color: Colors.transparent),
+        child: Center(
+          child: Text(
+            snackbarMessage,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w400, fontSize: 18),
+          ),
+        ),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }

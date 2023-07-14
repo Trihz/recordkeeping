@@ -41,6 +41,7 @@ dependencies:
   firebase_database: ^10.2.3
   pdf: ^3.10.0
   intl: ^0.18.1
+  fluttertoast: ^8.2.2
 
 dev_dependencies:
   flutter_test:
