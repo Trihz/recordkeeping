@@ -249,10 +249,12 @@ class _RecordsState extends State<Records> {
 
   /// method  to save the record details
   void saveRecordsData() async {
-    DatabaseReference ref =
-        FirebaseDatabase.instance.ref("records").child(widget.userName);
+    DatabaseReference ref = FirebaseDatabase.instance
+        .ref("info")
+        .child(widget.userName)
+        .child("records");
 
-    await ref.push().set({
+    await ref.child(recordDate).set({
       "date": recordDate,
       "title": recordTitle,
       "description": recordDescription

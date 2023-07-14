@@ -1,8 +1,8 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, non_constant_identifier_names, avoid_print, prefer_typing_uninitialized_variables
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:recordkeeping/homepage/homepage.dart';
 import 'package:recordkeeping/reports/report_display.dart';
 
 class Reports extends StatefulWidget {
@@ -18,64 +18,49 @@ class _ReportsState extends State<Reports> {
   String reportPeriod = "3 months";
 
   /// list variable to store all the data
-  List contentOfReport = [];
+  var contentOfReport;
 
-  /// list variables to store the data for the last 3 months,6 months and 12 months
-  List threeMonthsData = [];
-  List sixMonthsData = [];
-  List twelveMonthsData = [];
+  /// list variable to store the fetched reports
+  List fetchedReports = [];
+
+  /// Integer variables to store the count of the reports depending in the month
+  int count3 = 0;
+  int count6 = 0;
+  int count12 = 0;
 
   /// widget to show the top container
   Widget topContainer() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.21,
+      height: MediaQuery.of(context).size.height * 0.15,
       width: MediaQuery.of(context).size.width * 0.95,
+      padding: const EdgeInsets.only(left: 10),
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Row(
-            children: [
-              const SizedBox(
-                width: 5,
-              ),
-              /*GestureDetector(
-                  onTap: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: ((context) => const HomePage())));
-                  },
-                  child: const Icon(
-                    Icons.arrow_back_ios,
-                    color: Colors.blueAccent,
-                    size: 20,
-                  )),*/
-              SizedBox(
-                width: MediaQuery.of(context).size.height * 0.12,
-              ),
-              const Text(
-                "Previous reports",
-                style: TextStyle(
-                    color: Colors.black,
-                    fontWeight: FontWeight.w300,
-                    fontSize: 18),
-              ),
-            ],
+          const Align(
+            alignment: Alignment.centerLeft,
+            child: Text(
+              "Reports Count",
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
+            ),
           ),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
               Container(
-                height: MediaQuery.of(context).size.height * 0.13,
+                height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.27,
                 decoration: BoxDecoration(
-                    color: Colors.blueAccent,
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color.fromARGB(255, 99, 99, 99)
+                        color: const Color.fromARGB(255, 156, 156, 156)
                             .withOpacity(0.3),
                         spreadRadius: 1,
                         blurRadius: 1,
@@ -88,50 +73,30 @@ class _ReportsState extends State<Reports> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     const Text(
-                      "3 MONTHS",
+                      "3 Months",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13),
-                    ),
-                    const Text(
-                      "(10)",
-                      style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.blueAccent,
                           fontWeight: FontWeight.w400,
-                          fontSize: 14),
+                          fontSize: 15),
                     ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.03,
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: ElevatedButton(
-                          onPressed: (() {
-                            setState(() {
-                              reportPeriod = "3 months";
-                            });
-                          }),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.blueAccent),
-                          child: const Text(
-                            "VIEW",
-                            style: TextStyle(fontSize: 12),
-                          )),
-                    )
+                    Text(
+                      "(${count3.toString()})",
+                      style: const TextStyle(
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 15),
+                    ),
                   ],
                 ),
               ),
               Container(
-                height: MediaQuery.of(context).size.height * 0.13,
+                height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.27,
                 decoration: BoxDecoration(
-                    color: Colors.blueAccent,
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color.fromARGB(255, 99, 99, 99)
+                        color: const Color.fromARGB(255, 156, 156, 156)
                             .withOpacity(0.3),
                         spreadRadius: 1,
                         blurRadius: 1,
@@ -144,50 +109,30 @@ class _ReportsState extends State<Reports> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     const Text(
-                      "6 MONTHS",
+                      "6 Months",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13),
-                    ),
-                    const Text(
-                      "(2)",
-                      style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.blueAccent,
                           fontWeight: FontWeight.w400,
-                          fontSize: 14),
+                          fontSize: 15),
                     ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.03,
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: ElevatedButton(
-                          onPressed: (() {
-                            setState(() {
-                              reportPeriod = "6 months";
-                            });
-                          }),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.blueAccent),
-                          child: const Text(
-                            "VIEW",
-                            style: TextStyle(fontSize: 12),
-                          )),
-                    )
+                    Text(
+                      "(${count6.toString()})",
+                      style: const TextStyle(
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 15),
+                    ),
                   ],
                 ),
               ),
               Container(
-                height: MediaQuery.of(context).size.height * 0.13,
+                height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.27,
                 decoration: BoxDecoration(
-                    color: Colors.blueAccent,
+                    color: Colors.white,
                     boxShadow: [
                       BoxShadow(
-                        color: const Color.fromARGB(255, 99, 99, 99)
+                        color: const Color.fromARGB(255, 156, 156, 156)
                             .withOpacity(0.3),
                         spreadRadius: 1,
                         blurRadius: 1,
@@ -200,39 +145,19 @@ class _ReportsState extends State<Reports> {
                   mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
                     const Text(
-                      "12 MONTHS",
+                      "12 Months",
                       style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.w500,
-                          fontSize: 13),
-                    ),
-                    const Text(
-                      "(1)",
-                      style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.blueAccent,
                           fontWeight: FontWeight.w400,
-                          fontSize: 14),
+                          fontSize: 15),
                     ),
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.03,
-                      width: MediaQuery.of(context).size.width * 0.2,
-                      decoration: const BoxDecoration(
-                        color: Colors.white,
-                      ),
-                      child: ElevatedButton(
-                          onPressed: (() {
-                            setState(() {
-                              reportPeriod = "12 months";
-                            });
-                          }),
-                          style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.white,
-                              foregroundColor: Colors.blueAccent),
-                          child: const Text(
-                            "VIEW",
-                            style: TextStyle(fontSize: 12),
-                          )),
-                    )
+                    Text(
+                      "(${count12.toString()})",
+                      style: const TextStyle(
+                          color: Colors.blueAccent,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 15),
+                    ),
                   ],
                 ),
               ),
@@ -246,7 +171,7 @@ class _ReportsState extends State<Reports> {
   /// widget to display a list of all the reports
   Widget reportsDisplay() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.7,
+      height: MediaQuery.of(context).size.height * 0.75,
       width: MediaQuery.of(context).size.width * 0.95,
       padding: const EdgeInsets.only(left: 10),
       decoration: const BoxDecoration(
@@ -255,18 +180,18 @@ class _ReportsState extends State<Reports> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Align(
+          const Align(
             alignment: Alignment.centerLeft,
             child: Text(
-              "Reports (${reportPeriod})",
-              style: const TextStyle(
+              "All Reports",
+              style: TextStyle(
                   color: Colors.black,
-                  fontWeight: FontWeight.w300,
-                  fontSize: 18),
+                  fontWeight: FontWeight.w500,
+                  fontSize: 16),
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.62,
+            height: MediaQuery.of(context).size.height * 0.68,
             width: MediaQuery.of(context).size.width * 0.95,
             decoration: const BoxDecoration(
               color: Colors.transparent,
@@ -275,10 +200,10 @@ class _ReportsState extends State<Reports> {
               child: ListView.builder(
                   padding: const EdgeInsets.all(0.0),
                   scrollDirection: Axis.vertical,
-                  itemCount: 5,
+                  itemCount: fetchedReports.length,
                   itemBuilder: ((context, index) {
                     return Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
+                        height: MediaQuery.of(context).size.height * 0.1,
                         width: MediaQuery.of(context).size.width * 0.8,
                         margin: const EdgeInsets.only(
                             bottom: 15, left: 10, right: 15),
@@ -301,12 +226,24 @@ class _ReportsState extends State<Reports> {
                         child: Row(
                           mainAxisAlignment: MainAxisAlignment.spaceAround,
                           children: [
-                            const Text(
-                              "(12/02/2023 - 1/05/2023)",
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w500,
-                                  fontSize: 15),
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Text(
+                                  fetchedReports[index]["reportPeriod"],
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 15),
+                                ),
+                                Text(
+                                  fetchedReports[index]["reportType"],
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 15),
+                                ),
+                              ],
                             ),
                             GestureDetector(
                               onTap: () {
@@ -350,7 +287,7 @@ class _ReportsState extends State<Reports> {
   /// initial function of the screen
   @override
   void initState() {
-    getReportContent();
+    fetchAllReports();
     super.initState();
   }
 
@@ -375,18 +312,33 @@ class _ReportsState extends State<Reports> {
     );
   }
 
-  /// function to generate the report for the records
-  void getReportContent() {
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
-    databaseReference.onValue.listen((DatabaseEvent event) {
+  /// function to fetch all the reports from the database
+  void fetchAllReports() async {
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(widget.userName)
+        .child("reports");
+    databaseReference.onValue.listen((event) {
       for (var data in event.snapshot.children) {
         setState(() {
-          contentOfReport.add(data.value);
+          fetchedReports.add(data.value);
         });
       }
-
-      print(contentOfReport);
+      print(fetchedReports);
+      for (int x = 0; x < fetchedReports.length; x++) {
+        if (fetchedReports[x]["reportType"] == "3 Months") {
+          count3++;
+        } else if (fetchedReports[x]["reportType"] == "6 Months") {
+          count6++;
+        } else if (fetchedReports[x]["reportType"] == "12 Months") {
+          count12++;
+        }
+        print(fetchedReports[x]["reportType"]);
+      }
+      print(count3);
+      print(count6);
+      print(count12);
     });
   }
 }

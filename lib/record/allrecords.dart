@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable
+// ignore_for_file: must_be_immutable, avoid_print
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -161,8 +161,11 @@ class _AllRecordsState extends State<AllRecords> {
 
   /// function to return the details of all the records
   void getAllRecords() {
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(widget.userName)
+        .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {

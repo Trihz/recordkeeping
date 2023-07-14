@@ -2,6 +2,7 @@
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:recordkeeping/Account/account_ui.dart';
 import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
@@ -17,6 +18,27 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   String selectedOption = "1 DAY";
+
+  /// list variable to store all the data
+  var contentOfReport;
+
+  /// list variables to store the data for the last 3 months,6 months and 12 months
+  List threeMonthsData = [];
+  List sixMonthsData = [];
+  List twelveMonthsData = [];
+
+  /// variables to store the start and end dates of the 3,6 and 12 months period
+  String threeMonths_Start = "2023-07-14";
+  String sixMonths_Start = "2023-07-14";
+  String twelveMonths_Start = "2023-07-14";
+  String threeMonths_End = "";
+  String sixMonths_End = "";
+  String twelveMonths_End = "";
+
+  /// variable to store the report content, type of report that has been generated and the report periods
+  String reportType_ToDatabase = "";
+  String reportPeriod_ToDatabase = "";
+  List reportContent_ToDatabase = [];
 
   /// widget to display the top contiainer
   Widget topContainer() {
@@ -563,6 +585,13 @@ class _HomePageState extends State<HomePage> {
     /// number of `day`s in current month
     getNumberOfDays();
 
+    evaluateThreeMonthsPeriod();
+    evaluateSixMonthsPeriod();
+    evaluateTwelveMonthsPeriod();
+    getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
+    //getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
+    //getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
+
     super.initState();
   }
 
@@ -606,8 +635,11 @@ class _HomePageState extends State<HomePage> {
   void getRecordTitles() {
     int count = 0;
     recordsTitles.clear();
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(widget.userName)
+        .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {
@@ -676,8 +708,11 @@ class _HomePageState extends State<HomePage> {
     print(formattedDate);
 
     /// database operation
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(widget.userName)
+        .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {
@@ -811,5 +846,117 @@ class _HomePageState extends State<HomePage> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  /// THREE months
+  void getReportContent_ThreeMonths(String startDate, String endDate) async {
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("info").child(widget.userName);
+    databaseReference
+        .child("records")
+        .orderByChild('date')
+        .startAt(startDate)
+        .endAt(endDate)
+        .onValue
+        .listen((DatabaseEvent event) async {
+      setState(() {
+        contentOfReport = event.snapshot.value;
+      });
+      print(contentOfReport);
+      setState(() {
+        reportType_ToDatabase = "3 Months";
+        reportPeriod_ToDatabase = "( $startDate - $endDate)";
+        reportContent_ToDatabase.add(contentOfReport);
+      });
+      print(reportType_ToDatabase);
+      print(reportPeriod_ToDatabase);
+      print(reportContent_ToDatabase);
+      await databaseReference.child("reports").push().set({
+        "reportType": reportType_ToDatabase,
+        "reportPeriod": reportPeriod_ToDatabase,
+        "reportContent": contentOfReport.toString()
+      });
+    });
+  }
+
+  /// SIX months
+  void getReportContent_SixMonths(String startDate, String endDate) async {
+    Query databaseReference =
+        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    databaseReference
+        .orderByChild('date')
+        .startAt(startDate)
+        .endAt(endDate)
+        .onValue
+        .listen((DatabaseEvent event) {
+      final contentOfReport = event.snapshot.value;
+
+      if (contentOfReport != null) {
+        print(contentOfReport);
+      }
+    });
+  }
+
+  /// TWELVE months
+  void getReportContent_TwelveMonths(String startDate, String endDate) async {
+    Query databaseReference =
+        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
+    databaseReference
+        .orderByChild('date')
+        .startAt(startDate)
+        .endAt(endDate)
+        .onValue
+        .listen((DatabaseEvent event) {
+      final contentOfReport = event.snapshot.value;
+
+      if (contentOfReport != null) {
+        print(contentOfReport);
+      }
+    });
+  }
+
+  /// THREE months
+  void evaluateThreeMonthsPeriod() {
+    DateTime startDate = DateTime.parse(threeMonths_Start);
+    DateTime afterThreeMonths = startDate.add(const Duration(days: 3 * 30));
+
+    threeMonths_End = DateFormat('yyyy-MM-dd').format(afterThreeMonths);
+    print(threeMonths_Start);
+    print(threeMonths_End);
+  }
+
+  /// SIX months
+  void evaluateSixMonthsPeriod() {
+    DateTime startDate = DateTime.parse(sixMonths_Start);
+    DateTime afterSixMonths = startDate.add(const Duration(days: 6 * 30));
+
+    sixMonths_End = DateFormat('yyyy-MM-dd').format(afterSixMonths);
+    print(sixMonths_Start);
+    print(sixMonths_End);
+  }
+
+  /// TWELVE months
+  void evaluateTwelveMonthsPeriod() {
+    DateTime startDate = DateTime.parse(twelveMonths_Start);
+    DateTime afterTwelveMonths = startDate.add(const Duration(days: 365));
+
+    twelveMonths_End = DateFormat('yyyy-MM-dd').format(afterTwelveMonths);
+    print(twelveMonths_Start);
+    print(twelveMonths_End);
+  }
+
+  /// record the generated report if any
+  void recordReport() async {
+    print("***************************");
+    print(reportType_ToDatabase);
+    print(reportPeriod_ToDatabase);
+    print(reportContent_ToDatabase);
+    DatabaseReference databaseReference =
+        FirebaseDatabase.instance.ref().child("reports");
+    await databaseReference.child(reportType_ToDatabase).set({
+      "reportType": reportType_ToDatabase,
+      "reportPeriod": reportPeriod_ToDatabase,
+      "reportContent": reportContent_ToDatabase
+    });
   }
 }
