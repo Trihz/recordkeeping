@@ -7,7 +7,8 @@ import 'package:recordkeeping/homepage/homepage.dart';
 import 'package:intl/intl.dart';
 
 class Records extends StatefulWidget {
-  const Records({super.key});
+  String userName = "";
+  Records({super.key, required this.userName});
 
   @override
   State<Records> createState() => _RecordsState();
@@ -39,9 +40,9 @@ class _RecordsState extends State<Records> {
             decoration: const BoxDecoration(
               color: Colors.transparent,
             ),
-            child: Align(
+            child: const Align(
               alignment: Alignment.centerLeft,
-              child: GestureDetector(
+              /*child: GestureDetector(
                 onTap: () {
                   Navigator.push(
                       context,
@@ -52,7 +53,7 @@ class _RecordsState extends State<Records> {
                   Icons.arrow_back_ios,
                   color: Colors.white,
                 ),
-              ),
+              ),*/
             ),
           ),
           Container(
@@ -219,6 +220,14 @@ class _RecordsState extends State<Records> {
   }
 
   @override
+  void initState() {
+    print("****************************************************************");
+    print(widget.userName);
+    print("****************************************************************");
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SingleChildScrollView(
@@ -240,7 +249,8 @@ class _RecordsState extends State<Records> {
 
   /// method  to save the record details
   void saveRecordsData() async {
-    DatabaseReference ref = FirebaseDatabase.instance.ref("records");
+    DatabaseReference ref =
+        FirebaseDatabase.instance.ref("records").child(widget.userName);
 
     await ref.push().set({
       "date": recordDate,

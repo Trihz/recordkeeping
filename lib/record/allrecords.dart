@@ -1,9 +1,11 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:recordkeeping/homepage/homepage.dart';
 
 class AllRecords extends StatefulWidget {
-  const AllRecords({super.key});
+  String userName = "";
+  AllRecords({super.key, required this.userName});
 
   @override
   State<AllRecords> createState() => _AllRecordsState();
@@ -26,7 +28,7 @@ class _AllRecordsState extends State<AllRecords> {
           const SizedBox(
             width: 10,
           ),
-          GestureDetector(
+          /*GestureDetector(
               onTap: () {
                 Navigator.push(
                     context,
@@ -37,7 +39,7 @@ class _AllRecordsState extends State<AllRecords> {
                 Icons.arrow_back_ios,
                 color: Colors.blueAccent,
                 size: 20,
-              )),
+              )),*/
           SizedBox(
             width: MediaQuery.of(context).size.height * 0.15,
           ),
@@ -160,7 +162,7 @@ class _AllRecordsState extends State<AllRecords> {
   /// function to return the details of all the records
   void getAllRecords() {
     DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records");
+        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {

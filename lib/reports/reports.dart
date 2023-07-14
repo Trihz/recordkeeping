@@ -1,10 +1,13 @@
+// ignore_for_file: must_be_immutable
+
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
 import 'package:recordkeeping/reports/report_display.dart';
 
 class Reports extends StatefulWidget {
-  const Reports({super.key});
+  String userName = "";
+  Reports({super.key, required this.userName});
 
   @override
   State<Reports> createState() => _ReportsState();
@@ -13,6 +16,14 @@ class Reports extends StatefulWidget {
 class _ReportsState extends State<Reports> {
   /// string variable to store the period of the report
   String reportPeriod = "3 months";
+
+  /// list variable to store all the data
+  List contentOfReport = [];
+
+  /// list variables to store the data for the last 3 months,6 months and 12 months
+  List threeMonthsData = [];
+  List sixMonthsData = [];
+  List twelveMonthsData = [];
 
   /// widget to show the top container
   Widget topContainer() {
@@ -30,7 +41,7 @@ class _ReportsState extends State<Reports> {
               const SizedBox(
                 width: 5,
               ),
-              GestureDetector(
+              /*GestureDetector(
                   onTap: () {
                     Navigator.push(
                         context,
@@ -41,7 +52,7 @@ class _ReportsState extends State<Reports> {
                     Icons.arrow_back_ios,
                     color: Colors.blueAccent,
                     size: 20,
-                  )),
+                  )),*/
               SizedBox(
                 width: MediaQuery.of(context).size.height * 0.12,
               ),
@@ -364,13 +375,10 @@ class _ReportsState extends State<Reports> {
     );
   }
 
-  /// variable to store the content if the report being generated
-  List contentOfReport = [];
-
   /// function to generate the report for the records
   void getReportContent() {
     DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records");
+        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {

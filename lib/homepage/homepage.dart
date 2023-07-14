@@ -1,14 +1,15 @@
-// ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously
+// ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
-import 'package:recordkeeping/Account/account.dart';
+import 'package:recordkeeping/Account/account_ui.dart';
 import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
 import 'package:recordkeeping/reports/reports.dart';
 
 class HomePage extends StatefulWidget {
-  const HomePage({super.key});
+  String userName = "";
+  HomePage({super.key, required this.userName});
 
   @override
   State<HomePage> createState() => _HomePageState();
@@ -42,7 +43,7 @@ class _HomePageState extends State<HomePage> {
                 ),
                 accountIcon(),
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.03,
+                  height: MediaQuery.of(context).size.height * 0.02,
                 ),
                 scrollingDates()
               ],
@@ -90,10 +91,15 @@ class _HomePageState extends State<HomePage> {
                       ),
                     ],
                   ),
-                  const Icon(
-                    Icons.refresh,
-                    color: Colors.blueAccent,
-                    size: 30,
+                  GestureDetector(
+                    onTap: () {
+                      getRecordTitles();
+                    },
+                    child: const Icon(
+                      Icons.refresh,
+                      color: Colors.blueAccent,
+                      size: 30,
+                    ),
                   )
                 ],
               ),
@@ -119,7 +125,7 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the account icon
   Widget accountIcon() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.05,
+      height: MediaQuery.of(context).size.height * 0.06,
       width: MediaQuery.of(context).size.width * 1,
       padding: const EdgeInsets.only(left: 30, right: 15),
       decoration: const BoxDecoration(color: Colors.transparent),
@@ -131,19 +137,33 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(
                 color: Colors.white, fontWeight: FontWeight.w500, fontSize: 19),
           ),
-          GestureDetector(
-            onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: ((context) => const Account())));
-            },
-            child: Container(
-                width: 40,
-                height: 40,
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  shape: BoxShape.circle,
-                ),
-                child: const Icon(Icons.person)),
+          Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: ((context) => const AccountUI())));
+                },
+                child: Container(
+                    width: 30,
+                    height: 30,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      shape: BoxShape.circle,
+                    ),
+                    child: const Icon(Icons.person)),
+              ),
+              Text(
+                widget.userName,
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 13),
+              ),
+            ],
           ),
         ],
       ),
@@ -240,7 +260,9 @@ class _HomePageState extends State<HomePage> {
                     Navigator.push(
                         context,
                         MaterialPageRoute(
-                            builder: ((context) => const AllRecords())));
+                            builder: ((context) => AllRecords(
+                                  userName: widget.userName,
+                                ))));
                   },
                   child: Row(
                     children: const [
@@ -277,7 +299,9 @@ class _HomePageState extends State<HomePage> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: ((context) => const AllRecords())));
+                                builder: ((context) => AllRecords(
+                                      userName: widget.userName,
+                                    ))));
                       },
                       child: Container(
                         height: MediaQuery.of(context).size.height * 0.07,
@@ -430,8 +454,12 @@ class _HomePageState extends State<HomePage> {
           ),
           GestureDetector(
             onTap: () {
-              Navigator.push(context,
-                  MaterialPageRoute(builder: ((context) => const Reports())));
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: ((context) => Reports(
+                            userName: widget.userName,
+                          ))));
             },
             child: Container(
               height: MediaQuery.of(context).size.height * 0.12,
@@ -477,8 +505,12 @@ class _HomePageState extends State<HomePage> {
   Widget floatingButton() {
     return GestureDetector(
       onTap: () {
-        Navigator.push(context,
-            MaterialPageRoute(builder: ((context) => const Records())));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: ((context) => Records(
+                      userName: widget.userName,
+                    ))));
       },
       child: Container(
         height: MediaQuery.of(context).size.height * 0.08,
@@ -518,6 +550,10 @@ class _HomePageState extends State<HomePage> {
   /// initial function of the screen
   @override
   void initState() {
+    print("****************************************************************");
+    print(widget.userName);
+    print("****************************************************************");
+
     /// current month and year
     getCurrentMonthYear();
 
@@ -569,8 +605,9 @@ class _HomePageState extends State<HomePage> {
   /// function to get all the titles of the records
   void getRecordTitles() {
     int count = 0;
+    recordsTitles.clear();
     DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records");
+        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {
@@ -616,6 +653,7 @@ class _HomePageState extends State<HomePage> {
       String dateClicked, String month, String year) async {
     /// clear the filtered data variable
     filteredData.clear();
+    //recordData.clear();
     print("Before: $filteredData");
 
     /// get current month and date first
@@ -639,7 +677,7 @@ class _HomePageState extends State<HomePage> {
 
     /// database operation
     DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("records");
+        FirebaseDatabase.instance.ref().child("records").child(widget.userName);
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
         setState(() {
@@ -668,26 +706,29 @@ class _HomePageState extends State<HomePage> {
     print("Snackbar: $filteredData");
     print(filteredData.length);
     final snackBar = SnackBar(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.blueAccent,
       padding: const EdgeInsets.all(0),
       duration: const Duration(days: 20),
       content: Container(
         height: MediaQuery.of(context).size.height * 0.4,
         width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(color: Colors.white),
+        decoration: const BoxDecoration(color: Colors.blueAccent),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
               height: MediaQuery.of(context).size.height * 0.05,
               width: MediaQuery.of(context).size.width * 1,
-              decoration: const BoxDecoration(color: Colors.white),
+              margin: const EdgeInsets.only(left: 10),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
               child: const Center(
                 child: Text(
                   "(10-04-2022)",
                   style: TextStyle(
                       color: Colors.blueAccent,
-                      fontWeight: FontWeight.w300,
+                      fontWeight: FontWeight.w600,
                       fontSize: 18),
                 ),
               ),
@@ -695,7 +736,11 @@ class _HomePageState extends State<HomePage> {
             Container(
               height: MediaQuery.of(context).size.height * 0.3,
               width: MediaQuery.of(context).size.width * 1,
-              decoration: const BoxDecoration(color: Colors.white),
+              margin: const EdgeInsets.only(left: 10),
+              padding: const EdgeInsets.only(top: 10, bottom: 10),
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(5))),
               child: ListView.builder(
                   itemCount: filteredData.length,
                   itemBuilder: ((context, index) {
@@ -760,7 +805,7 @@ class _HomePageState extends State<HomePage> {
       ),
       action: SnackBarAction(
         label: 'BACK',
-        textColor: Colors.blueAccent,
+        textColor: Colors.white,
         onPressed: () {},
       ),
     );
