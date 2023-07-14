@@ -1,9 +1,10 @@
-// ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable
+// ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable, prefer_typing_uninitialized_variables
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import 'package:recordkeeping/Account/account_ui.dart';
+import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
 import 'package:recordkeeping/reports/reports.dart';
@@ -17,6 +18,17 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  /// variable to store the gradient color for containers
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
+  /// variable to store default period for the manual report request
   String selectedOption = "1 DAY";
 
   /// list variable to store all the data
@@ -53,9 +65,9 @@ class _HomePageState extends State<HomePage> {
           Container(
             height: MediaQuery.of(context).size.height * 0.3,
             width: MediaQuery.of(context).size.width * 1,
-            decoration: const BoxDecoration(
-                color: Colors.blueAccent,
-                borderRadius: BorderRadius.only(
+            decoration: BoxDecoration(
+                gradient: gradient,
+                borderRadius: const BorderRadius.only(
                     bottomLeft: Radius.circular(40),
                     bottomRight: Radius.circular(40))),
             child: Column(
@@ -213,9 +225,9 @@ class _HomePageState extends State<HomePage> {
                 height: MediaQuery.of(context).size.height * 0.07,
                 width: MediaQuery.of(context).size.width * 0.15,
                 margin:
-                    const EdgeInsets.only(left: 4, right: 4, top: 2, bottom: 2),
+                    const EdgeInsets.only(left: 6, right: 6, top: 2, bottom: 2),
                 decoration: BoxDecoration(
-                    color: Colors.blueAccent,
+                    gradient: gradient,
                     boxShadow: [
                       BoxShadow(
                         color: const Color.fromARGB(255, 255, 255, 255)
@@ -287,19 +299,16 @@ class _HomePageState extends State<HomePage> {
                                 ))));
                   },
                   child: Row(
-                    children: const [
-                      Text(
+                    children: [
+                      const Text(
                         "View",
                         style: TextStyle(
                             fontSize: 17,
-                            color: Colors.blueAccent,
+                            color: Colors.black,
                             fontWeight: FontWeight.w400),
                       ),
-                      SizedBox(width: 5),
-                      Icon(
-                        Icons.view_comfy_alt,
-                        color: Colors.blueAccent,
-                      ),
+                      const SizedBox(width: 5),
+                      GradientIcon(Icons.view_comfy_alt, 25, gradient)
                     ],
                   ),
                 )
@@ -488,7 +497,7 @@ class _HomePageState extends State<HomePage> {
               width: MediaQuery.of(context).size.width * 0.3,
               padding: const EdgeInsets.only(left: 7, right: 5),
               decoration: BoxDecoration(
-                  color: Colors.blueAccent,
+                  gradient: gradient,
                   boxShadow: [
                     BoxShadow(
                       color: const Color.fromARGB(255, 99, 99, 99)
@@ -545,7 +554,7 @@ class _HomePageState extends State<HomePage> {
             width: 60,
             height: 60,
             decoration: BoxDecoration(
-              color: Colors.blueAccent,
+              gradient: gradient,
               boxShadow: [
                 BoxShadow(
                   color: const Color.fromARGB(255, 0, 0, 0).withOpacity(0.3),
@@ -741,20 +750,22 @@ class _HomePageState extends State<HomePage> {
     print("Snackbar: $filteredData");
     print(filteredData.length);
     final snackBar = SnackBar(
-      backgroundColor: Colors.blueAccent,
+      backgroundColor: Colors.white,
       padding: const EdgeInsets.all(0),
       duration: const Duration(days: 20),
       content: Container(
         height: MediaQuery.of(context).size.height * 0.4,
         width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(color: Colors.blueAccent),
+        decoration: BoxDecoration(
+          gradient: gradient,
+        ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
             Container(
               height: MediaQuery.of(context).size.height * 0.05,
               width: MediaQuery.of(context).size.width * 1,
-              margin: const EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10, right: 10),
               decoration: const BoxDecoration(
                   color: Colors.white,
                   borderRadius: BorderRadius.all(Radius.circular(5))),
@@ -762,8 +773,8 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   "(10-04-2022)",
                   style: TextStyle(
-                      color: Colors.blueAccent,
-                      fontWeight: FontWeight.w600,
+                      color: Colors.black,
+                      fontWeight: FontWeight.w500,
                       fontSize: 18),
                 ),
               ),
@@ -771,7 +782,7 @@ class _HomePageState extends State<HomePage> {
             Container(
               height: MediaQuery.of(context).size.height * 0.3,
               width: MediaQuery.of(context).size.width * 1,
-              margin: const EdgeInsets.only(left: 10),
+              margin: const EdgeInsets.only(left: 10, right: 10),
               padding: const EdgeInsets.only(top: 10, bottom: 10),
               decoration: const BoxDecoration(
                   color: Colors.white,
@@ -839,8 +850,8 @@ class _HomePageState extends State<HomePage> {
         ),
       ),
       action: SnackBarAction(
-        label: 'BACK',
-        textColor: Colors.white,
+        label: 'CLOSE',
+        textColor: Colors.black,
         onPressed: () {},
       ),
     );

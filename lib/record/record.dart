@@ -15,6 +15,16 @@ class Records extends StatefulWidget {
 }
 
 class _RecordsState extends State<Records> {
+  /// variable to store the gradient color for containers
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
   /// variables to store the details concerning tyhe record
   String recordDate = "SELECT DATE";
   String recordTitle = "";
@@ -25,8 +35,8 @@ class _RecordsState extends State<Records> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.46,
       width: MediaQuery.of(context).size.width * 0.99,
-      decoration: const BoxDecoration(
-          color: Colors.blueAccent,
+      decoration: BoxDecoration(
+          gradient: gradient,
           borderRadius: BorderRadius.only(
               bottomLeft: Radius.circular(10),
               bottomRight: Radius.circular(10))),
@@ -63,7 +73,17 @@ class _RecordsState extends State<Records> {
                 color: Colors.transparent,
               ),
               child: CalendarDatePicker2(
-                config: CalendarDatePicker2Config(),
+                config: CalendarDatePicker2Config(
+                    dayTextStyle: const TextStyle(color: Colors.white),
+                    selectedDayHighlightColor: Colors.white,
+                    selectedDayTextStyle: const TextStyle(
+                        fontWeight: FontWeight.w600, color: Colors.black),
+                    todayTextStyle: const TextStyle(
+                        color: Colors.white,
+                        fontWeight: FontWeight.w900,
+                        fontSize: 16),
+                    controlsTextStyle: const TextStyle(
+                        color: Colors.black, fontWeight: FontWeight.w600)),
                 value: [],
                 onValueChanged: (value) {
                   formatDate(value[0].toString());
@@ -206,15 +226,14 @@ class _RecordsState extends State<Records> {
             checkEntryOfDetails();
           },
           style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.blueAccent,
-              foregroundColor: Colors.white,
+              backgroundColor: Colors.grey.shade200,
+              foregroundColor: Colors.black,
+              shadowColor: Colors.grey,
               shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(5))),
           child: const Text(
             "SAVE",
-            style: TextStyle(
-              color: Color.fromARGB(255, 255, 255, 255),
-            ),
+            style: TextStyle(fontSize: 16),
           )),
     );
   }

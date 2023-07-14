@@ -46,7 +46,7 @@ class _AllRecordsState extends State<AllRecords> {
           const Text(
             "All Records",
             style: TextStyle(
-                color: Colors.blueAccent,
+                color: Colors.orange,
                 fontWeight: FontWeight.w400,
                 fontSize: 19),
           ),

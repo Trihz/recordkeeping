@@ -12,6 +12,16 @@ class SignUp extends StatefulWidget {
 }
 
 class _SignUpState extends State<SignUp> {
+  /// variable to store the gradient color for containers
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
   /// variables to store the user details
   String userName = "";
   String userGmail = "";
@@ -25,7 +35,7 @@ class _SignUpState extends State<SignUp> {
       width: MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
-        color: Colors.blueAccent,
+        gradient: gradient,
         borderRadius: const BorderRadius.all(Radius.circular(10)),
         boxShadow: [
           BoxShadow(
@@ -245,7 +255,7 @@ class _SignUpState extends State<SignUp> {
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.black,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)))),
                   child: const Text(
@@ -267,7 +277,7 @@ class _SignUpState extends State<SignUp> {
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.black,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)))),
                   child: const Text(
@@ -381,15 +391,23 @@ class _SignUpState extends State<SignUp> {
         userGmail.isEmpty ||
         userPassword.isEmpty ||
         userPassword2.isEmpty) {
-      print("Enter all the details");
       showSnackBar("Please enter all the details");
+    } else {
+      checkPasswordMatching();
+    }
+  }
+
+  /// check whether the passwords are matching
+  void checkPasswordMatching() {
+    if (userPassword != userPassword2) {
+      showSnackBar("Passwords are not matching");
     } else {
       registerUser();
       success(context);
     }
   }
 
-  /// signup errors snackba
+  /// signup errors snackbar
   void showSnackBar(String snackbarMessage) {
     final snackBar = SnackBar(
       backgroundColor: Colors.blueAccent,

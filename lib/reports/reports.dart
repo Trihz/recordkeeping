@@ -14,6 +14,16 @@ class Reports extends StatefulWidget {
 }
 
 class _ReportsState extends State<Reports> {
+  /// variable to store the gradient color for containers
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
   /// string variable to store the period of the report
   String reportPeriod = "3 months";
 
@@ -57,7 +67,7 @@ class _ReportsState extends State<Reports> {
                 height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.27,
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    gradient: gradient,
                     boxShadow: [
                       BoxShadow(
                         color: const Color.fromARGB(255, 156, 156, 156)
@@ -75,14 +85,14 @@ class _ReportsState extends State<Reports> {
                     const Text(
                       "3 Months",
                       style: TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.w400,
                           fontSize: 15),
                     ),
                     Text(
                       "(${count3.toString()})",
                       style: const TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.w300,
                           fontSize: 15),
                     ),
@@ -93,7 +103,7 @@ class _ReportsState extends State<Reports> {
                 height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.27,
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    gradient: gradient,
                     boxShadow: [
                       BoxShadow(
                         color: const Color.fromARGB(255, 156, 156, 156)
@@ -111,14 +121,14 @@ class _ReportsState extends State<Reports> {
                     const Text(
                       "6 Months",
                       style: TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.w400,
                           fontSize: 15),
                     ),
                     Text(
                       "(${count6.toString()})",
                       style: const TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.w300,
                           fontSize: 15),
                     ),
@@ -129,7 +139,7 @@ class _ReportsState extends State<Reports> {
                 height: MediaQuery.of(context).size.height * 0.08,
                 width: MediaQuery.of(context).size.width * 0.27,
                 decoration: BoxDecoration(
-                    color: Colors.white,
+                    gradient: gradient,
                     boxShadow: [
                       BoxShadow(
                         color: const Color.fromARGB(255, 156, 156, 156)
@@ -147,14 +157,14 @@ class _ReportsState extends State<Reports> {
                     const Text(
                       "12 Months",
                       style: TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.w400,
                           fontSize: 15),
                     ),
                     Text(
                       "(${count12.toString()})",
                       style: const TextStyle(
-                          color: Colors.blueAccent,
+                          color: Colors.white,
                           fontWeight: FontWeight.w300,
                           fontSize: 15),
                     ),

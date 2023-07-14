@@ -18,15 +18,25 @@ class _AuthenticationState extends State<Authentication> {
   String userPassword = "";
   String userPassword_Database = "";
 
+  /// variable to store the gradient color for containers
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
   /// LOGIN widget
   Widget displayLogin() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.3,
-      width: MediaQuery.of(context).size.width * 0.7,
+      height: MediaQuery.of(context).size.height * 0.35,
+      width: MediaQuery.of(context).size.width * 0.8,
       padding: const EdgeInsets.only(left: 10, right: 10),
       decoration: BoxDecoration(
-        color: Colors.blueAccent,
-        borderRadius: const BorderRadius.all(Radius.circular(10)),
+        gradient: gradient,
+        borderRadius: const BorderRadius.all(Radius.circular(5)),
         boxShadow: [
           BoxShadow(
             color: const Color.fromARGB(255, 255, 255, 255).withOpacity(0.2),
@@ -140,6 +150,7 @@ class _AuthenticationState extends State<Authentication> {
               Container(
                 height: MediaQuery.of(context).size.height * 0.05,
                 width: MediaQuery.of(context).size.width * 0.3,
+                margin: const EdgeInsets.only(left: 10),
                 decoration: const BoxDecoration(
                   color: Colors.transparent,
                 ),
@@ -149,7 +160,7 @@ class _AuthenticationState extends State<Authentication> {
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.black,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)))),
                   child: const Text(
@@ -161,6 +172,7 @@ class _AuthenticationState extends State<Authentication> {
               Container(
                 height: MediaQuery.of(context).size.height * 0.05,
                 width: MediaQuery.of(context).size.width * 0.3,
+                margin: const EdgeInsets.only(right: 10),
                 decoration: const BoxDecoration(
                   color: Colors.transparent,
                 ),
@@ -173,7 +185,7 @@ class _AuthenticationState extends State<Authentication> {
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.white,
-                      foregroundColor: Colors.blueAccent,
+                      foregroundColor: Colors.black,
                       shape: const RoundedRectangleBorder(
                           borderRadius: BorderRadius.all(Radius.circular(5)))),
                   child: const Text(
@@ -192,14 +204,27 @@ class _AuthenticationState extends State<Authentication> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height * 1,
-        width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(
-          color: Colors.blueAccent,
-        ),
-        child: Center(
-          child: displayLogin(),
+      backgroundColor: Colors.white,
+      body: Center(
+        child: Container(
+          height: MediaQuery.of(context).size.height * 0.6,
+          width: MediaQuery.of(context).size.width * 1,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [
+              const Text(
+                "Record Keeping App",
+                style: TextStyle(
+                    color: Colors.black,
+                    fontWeight: FontWeight.w400,
+                    fontSize: 22),
+              ),
+              displayLogin(),
+            ],
+          ),
         ),
       ),
     );
@@ -210,7 +235,7 @@ class _AuthenticationState extends State<Authentication> {
     print(userName);
     print(userPassword);
     if (userName.isEmpty || userPassword.isEmpty) {
-      print("Enter all details");
+      showSnackBar("Please enter all the details");
     } else {
       DatabaseReference databaseReference = FirebaseDatabase.instance
           .ref()
@@ -225,10 +250,9 @@ class _AuthenticationState extends State<Authentication> {
       });
       print(userPassword_Database);
       if (userPassword_Database == "null") {
-        print("The user does not exists");
+        showSnackBar("The user does not exists");
       } else {
         if (userPassword_Database == userPassword) {
-          print("Passwords are matching");
           Navigator.pushAndRemoveUntil(
               context,
               MaterialPageRoute(
@@ -237,9 +261,32 @@ class _AuthenticationState extends State<Authentication> {
                       ))),
               (route) => false);
         } else {
-          print("Passwords not matching");
+          showSnackBar("Passwords not matching");
         }
       }
     }
+  }
+
+  /// login errors snackbar
+  void showSnackBar(String snackbarMessage) {
+    final snackBar = SnackBar(
+      backgroundColor: Colors.blueAccent,
+      padding: const EdgeInsets.all(0),
+      duration: const Duration(milliseconds: 600),
+      content: Container(
+        height: MediaQuery.of(context).size.height * 0.06,
+        width: MediaQuery.of(context).size.width * 1,
+        decoration: const BoxDecoration(color: Colors.transparent),
+        child: Center(
+          child: Text(
+            snackbarMessage,
+            style: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w400, fontSize: 18),
+          ),
+        ),
+      ),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 }
