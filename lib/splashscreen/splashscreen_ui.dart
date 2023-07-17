@@ -2,7 +2,7 @@ import 'dart:async';
 
 import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:flutter/material.dart';
-import 'package:recordkeeping/authentication/login.dart';
+import 'package:recordkeeping/AuthenticationFirebase/auth_widget_tree.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen> {
     _timer = Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Authentication()),
+        MaterialPageRoute(builder: (context) => AuthWidgetTree()),
       );
     });
   }
@@ -43,21 +43,18 @@ class _SplashScreenState extends State<SplashScreen> {
               color: Colors.white,
               borderRadius: BorderRadius.all(Radius.circular(10))),
           child: Center(
-              child: SizedBox(
-            width: 250.0,
-            child: AnimatedTextKit(
-              animatedTexts: [
-                ColorizeAnimatedText(
-                  'RECORD KEEPER',
-                  textStyle: const TextStyle(
-                      fontSize: 30.0,
-                      fontFamily: 'Horizon',
-                      fontWeight: FontWeight.w900),
-                  colors: [Colors.orange, Colors.purple],
-                ),
-              ],
-              isRepeatingAnimation: true,
-            ),
+              child: AnimatedTextKit(
+            animatedTexts: [
+              ColorizeAnimatedText(
+                'RECORD KEEPER',
+                textStyle: const TextStyle(
+                    fontSize: 25.0,
+                    fontFamily: 'Horizon',
+                    fontWeight: FontWeight.w900),
+                colors: [Colors.orange, Colors.purple],
+              ),
+            ],
+            isRepeatingAnimation: true,
           )),
         ),
       ),

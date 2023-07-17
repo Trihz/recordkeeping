@@ -1,5 +1,6 @@
 // ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable, prefer_typing_uninitialized_variables
 
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
@@ -8,6 +9,9 @@ import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
 import 'package:recordkeeping/reports/reports.dart';
+import 'dart:io';
+
+import '../AuthenticationFirebase/auth.dart';
 
 class HomePage extends StatefulWidget {
   String userGmail = "";
@@ -175,13 +179,7 @@ class _HomePageState extends State<HomePage> {
           Column(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
             children: [
-              GestureDetector(
-                onTap: () {
-                  /*Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: ((context) => const AccountUI())));*/
-                },
+              PopupMenuButton<String>(
                 child: Container(
                     width: 30,
                     height: 30,
@@ -190,6 +188,34 @@ class _HomePageState extends State<HomePage> {
                       shape: BoxShape.circle,
                     ),
                     child: const Icon(Icons.person)),
+                onSelected: (value) {
+                  if (value == 'logout') {
+                    signOut();
+                  } else if (value == 'myaccount') {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) =>
+                              AccountUI(userGmail: widget.userGmail)),
+                    );
+                  }
+                },
+                itemBuilder: (BuildContext context) => [
+                  const PopupMenuItem<String>(
+                    value: 'logout',
+                    child: Text(
+                      'Logout',
+                      style: TextStyle(color: Colors.black, fontSize: 15),
+                    ),
+                  ),
+                  const PopupMenuItem<String>(
+                    value: 'myaccount',
+                    child: Text(
+                      'Account',
+                      style: TextStyle(color: Colors.black, fontSize: 15),
+                    ),
+                  ),
+                ],
               ),
               Text(
                 userName,
@@ -648,6 +674,9 @@ class _HomePageState extends State<HomePage> {
   String currentMonth = "";
   String currentYear = "";
 
+  /// Auth User object
+  final User? user = Auth().currentUser;
+
   /// Get username
   void fetchUserName() {
     DatabaseReference databaseReference = FirebaseDatabase.instance
@@ -1002,5 +1031,10 @@ class _HomePageState extends State<HomePage> {
       "reportPeriod": reportPeriod_ToDatabase,
       "reportContent": reportContent_ToDatabase
     });
+  }
+
+  /// Sign out
+  Future<void> signOut() async {
+    await Auth().signOut();
   }
 }

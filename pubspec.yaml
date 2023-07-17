@@ -39,11 +39,17 @@ dependencies:
   calendar_date_picker2: ^0.5.2
   firebase_core: ^2.14.0
   firebase_database: ^10.2.3
+  firebase_auth: ^4.7.0
   pdf: ^3.10.0
   intl: ^0.18.1
   fluttertoast: ^8.2.2
   animated_text_kit: ^4.2.2
   simple_gradient_text: ^1.2.4
+  flutter_map_arcgis: ^2.0.4
+  flutter_map: ^2.1.1
+  latlong: ^0.6.1
+  dio: ^4.0.6
+  connectivity_plus: ^3.0.6
 
 dev_dependencies:
   flutter_test:
