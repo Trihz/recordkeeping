@@ -3,6 +3,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:recordkeeping/Account/account_ui.dart';
 import 'package:recordkeeping/gradient/gradient_class.dart';
@@ -65,7 +66,7 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the top contiainer
   Widget topContainer() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.32,
+      height: MediaQuery.of(context).size.height * 0.22,
       width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(
         color: Colors.transparent,
@@ -73,7 +74,7 @@ class _HomePageState extends State<HomePage> {
       child: Stack(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.2,
             width: MediaQuery.of(context).size.width * 1,
             decoration: BoxDecoration(
                 gradient: gradient,
@@ -89,7 +90,6 @@ class _HomePageState extends State<HomePage> {
                 SizedBox(
                   height: MediaQuery.of(context).size.height * 0.02,
                 ),
-                scrollingDates()
               ],
             ),
           ),
@@ -152,11 +152,22 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the bottom container
   Widget bottomContainer() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.68,
+      height: MediaQuery.of(context).size.height * 0.78,
       width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
-        children: [records(), statsContainer(), floatingButton()],
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        children: [
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.02,
+          ),
+          records(),
+          statsContainer(),
+          SizedBox(
+            height: MediaQuery.of(context).size.height * 0.02,
+          ),
+          floatingButton()
+        ],
       ),
     );
   }
@@ -231,82 +242,11 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// wdiget to display the scrolling dates
-  Widget scrollingDates() {
-    return Container(
-      height: MediaQuery.of(context).size.height * 0.08,
-      width: MediaQuery.of(context).size.width * 0.8,
-      decoration: const BoxDecoration(color: Colors.transparent),
-      child: ListView.builder(
-          itemCount: numberOfDays_CurrentMonth,
-          scrollDirection: Axis.horizontal,
-          itemBuilder: ((context, index) {
-            return GestureDetector(
-              onTap: () {
-                showSnackBar();
-                getRecordsBasedOnDate(
-                    (index + 1).toString(), currentMonth, currentYear);
-                setState(() {
-                  if (currentMonth.length == 1) {
-                    currentMonth = "0$currentMonth";
-                  }
-                  if ((index + 1).toString().length == 1) {
-                    clickedDate = "0${index + 1}-$currentMonth-$currentYear";
-                  } else {
-                    clickedDate = "${index + 1}-$currentMonth-$currentYear";
-                  }
-                });
-                print(index + 1);
-              },
-              child: Container(
-                height: MediaQuery.of(context).size.height * 0.07,
-                width: MediaQuery.of(context).size.width * 0.15,
-                margin:
-                    const EdgeInsets.only(left: 6, right: 6, top: 2, bottom: 2),
-                decoration: BoxDecoration(
-                    gradient: gradient,
-                    boxShadow: [
-                      BoxShadow(
-                        color: const Color.fromARGB(255, 255, 255, 255)
-                            .withOpacity(0.3),
-                        spreadRadius: 1,
-                        blurRadius: 1,
-                        offset:
-                            const Offset(0, 1), // changes position of shadow
-                      ),
-                    ],
-                    borderRadius: const BorderRadius.all(Radius.circular(3))),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    const Text(
-                      "Day",
-                      style: TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w400,
-                          fontSize: 15),
-                    ),
-                    Text(
-                      (index + 1).toString(),
-                      style: const TextStyle(
-                          color: Colors.black,
-                          fontWeight: FontWeight.w600,
-                          fontSize: 15),
-                    ),
-                  ],
-                ),
-              ),
-            );
-          })),
-    );
-  }
-
   /// widget to display the records of the user
   Widget records() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.38,
+      height: MediaQuery.of(context).size.height * 0.53,
       width: MediaQuery.of(context).size.width * 1,
-      margin: const EdgeInsets.only(top: 15, bottom: 10),
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -353,7 +293,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.35,
+            height: MediaQuery.of(context).size.height * 0.49,
             width: MediaQuery.of(context).size.width * 1,
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ListView.builder(
@@ -430,94 +370,50 @@ class _HomePageState extends State<HomePage> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.12,
       width: MediaQuery.of(context).size.width * 0.95,
-      margin: const EdgeInsets.only(top: 20, bottom: 20),
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         children: [
-          Container(
-            height: MediaQuery.of(context).size.height * 0.12,
-            width: MediaQuery.of(context).size.width * 0.6,
-            padding: const EdgeInsets.only(left: 8, right: 5),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              boxShadow: [
-                BoxShadow(
-                  color: const Color.fromARGB(255, 99, 99, 99).withOpacity(0.2),
-                  spreadRadius: 1,
-                  blurRadius: 1,
-                  offset: const Offset(0, 1), // changes position of shadow
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                const Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Request a report",
+          GestureDetector(
+            onTap: () {
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: ((context) => Reports(
+                            userGmail: widget.userGmail,
+                          ))));
+            },
+            child: Container(
+              height: MediaQuery.of(context).size.height * 0.12,
+              width: MediaQuery.of(context).size.width * 0.3,
+              padding: const EdgeInsets.only(left: 7, right: 5),
+              decoration: BoxDecoration(
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: const Color.fromARGB(255, 99, 99, 99)
+                          .withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 1,
+                      offset: const Offset(0, 1), // changes position of shadow
+                    ),
+                  ],
+                  borderRadius: const BorderRadius.all(Radius.circular(10))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Text(
+                    "REPORTS",
                     style: TextStyle(
                         color: Colors.black,
-                        fontWeight: FontWeight.w300,
-                        fontSize: 18),
+                        fontWeight: FontWeight.w400,
+                        fontSize: 13),
                   ),
-                ),
-                Row(
-                  children: [
-                    Container(
-                      height: MediaQuery.of(context).size.height * 0.05,
-                      width: MediaQuery.of(context).size.width * 0.3,
-                      padding: const EdgeInsets.only(left: 10),
-                      decoration: BoxDecoration(
-                          color: Colors.white,
-                          boxShadow: [
-                            BoxShadow(
-                              color: const Color.fromARGB(255, 99, 99, 99)
-                                  .withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                              offset: const Offset(
-                                  0, 1), // changes position of shadow
-                            ),
-                          ],
-                          borderRadius:
-                              const BorderRadius.all(Radius.circular(7))),
-                      child: DropdownButton<String>(
-                        iconEnabledColor: Colors.black,
-                        underline: const SizedBox(),
-                        style: const TextStyle(
-                            color: Colors.black,
-                            fontWeight: FontWeight.w400,
-                            fontSize: 14),
-                        borderRadius:
-                            const BorderRadius.all(Radius.circular(10)),
-                        value: selectedOption,
-                        onChanged: (value) {},
-                        items: <String>[
-                          '1 DAY',
-                          '1 WEEK',
-                          '1 MONTH',
-                        ].map<DropdownMenuItem<String>>((String value) {
-                          return DropdownMenuItem<String>(
-                            value: value,
-                            child: Text(value),
-                          );
-                        }).toList(),
-                      ),
-                    ),
-                    const SizedBox(width: 10),
-                    ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.grey.shade200,
-                            foregroundColor: Colors.black),
-                        child: const Text("REQUEST"))
-                  ],
-                )
-              ],
+                  GradientIcon(Icons.view_agenda, 35, gradient)
+                ],
+              ),
             ),
           ),
           GestureDetector(
@@ -534,7 +430,7 @@ class _HomePageState extends State<HomePage> {
               width: MediaQuery.of(context).size.width * 0.3,
               padding: const EdgeInsets.only(left: 7, right: 5),
               decoration: BoxDecoration(
-                  gradient: gradient,
+                  color: Colors.white,
                   boxShadow: [
                     BoxShadow(
                       color: const Color.fromARGB(255, 99, 99, 99)
@@ -547,19 +443,15 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: const BorderRadius.all(Radius.circular(10))),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                children: const [
-                  Text(
-                    "REPORTS",
+                children: [
+                  const Text(
+                    "CALCULATOR",
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
-                        fontSize: 17),
+                        fontSize: 13),
                   ),
-                  Icon(
-                    Icons.view_agenda,
-                    color: Colors.black,
-                    size: 25,
-                  )
+                  GradientIcon(Icons.calculate, 35, gradient)
                 ],
               ),
             ),
@@ -618,6 +510,12 @@ class _HomePageState extends State<HomePage> {
   /// initial function of the screen
   @override
   void initState() {
+    var box = Hive.box('Gmail');
+    box.put('name', 'David');
+    var name = box.get('name');
+    print('Name: $name');
+    print(widget.userGmail);
+
     /// fetch username
     fetchUserName();
 
@@ -795,126 +693,6 @@ class _HomePageState extends State<HomePage> {
       }
     }
     print("After: $filteredData");
-  }
-
-  /// function to show the snackbar
-  void showSnackBar() async {
-    print("Snackbar: $filteredData");
-
-    // Retrieve the data from Firebase
-    await getRecordsBasedOnDate("22", currentMonth, currentYear);
-
-    print("Snackbar: $filteredData");
-    print(filteredData.length);
-    final snackBar = SnackBar(
-      backgroundColor: Colors.white,
-      padding: const EdgeInsets.all(0),
-      duration: const Duration(days: 20),
-      content: Container(
-        height: MediaQuery.of(context).size.height * 0.4,
-        width: MediaQuery.of(context).size.width * 1,
-        margin: const EdgeInsets.only(left: 5, bottom: 5),
-        decoration: BoxDecoration(
-            gradient: gradient,
-            borderRadius: const BorderRadius.all(Radius.circular(5))),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height * 0.05,
-              width: MediaQuery.of(context).size.width * 1,
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: Center(
-                child: Text(
-                  clickedDate,
-                  style: const TextStyle(
-                      color: Colors.black,
-                      fontWeight: FontWeight.w500,
-                      fontSize: 16),
-                ),
-              ),
-            ),
-            Container(
-              height: MediaQuery.of(context).size.height * 0.3,
-              width: MediaQuery.of(context).size.width * 1,
-              margin: const EdgeInsets.only(left: 10, right: 10),
-              padding: const EdgeInsets.only(top: 10, bottom: 10),
-              decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.all(Radius.circular(5))),
-              child: ListView.builder(
-                  itemCount: filteredData.length,
-                  itemBuilder: ((context, index) {
-                    return Container(
-                      width: MediaQuery.of(context).size.width * 0.8,
-                      padding: const EdgeInsets.only(
-                          left: 10, right: 10, top: 6, bottom: 6),
-                      margin: const EdgeInsets.only(
-                          bottom: 15, left: 10, right: 10, top: 5),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: const Color.fromARGB(255, 99, 99, 99)
-                                .withOpacity(0.2),
-                            spreadRadius: 1,
-                            blurRadius: 1,
-                            offset: const Offset(
-                                0, 1), // changes position of shadow
-                          ),
-                        ],
-                      ),
-                      child: Column(
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                filteredData[index]["title"],
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 13),
-                              ),
-                              Text(
-                                filteredData[index]["date"],
-                                style: const TextStyle(
-                                    color: Colors.black,
-                                    fontWeight: FontWeight.w400,
-                                    fontSize: 13),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 10),
-                          Align(
-                            alignment: Alignment.centerLeft,
-                            child: Text(
-                              filteredData[index]["description"],
-                              style: const TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.w300,
-                                  fontSize: 13),
-                            ),
-                          ),
-                        ],
-                      ),
-                    );
-                  })),
-            ),
-          ],
-        ),
-      ),
-      action: SnackBarAction(
-        label: 'CLOSE',
-        textColor: Colors.black,
-        onPressed: () {},
-      ),
-    );
-
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   /// THREE months
