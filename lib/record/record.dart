@@ -29,12 +29,13 @@ class _RecordsState extends State<Records> {
   /// variables to store the details concerning tyhe record
   String recordDate = "SELECT DATE";
   String recordTitle = "";
+  String recordAmount = "";
   String recordDescription = "";
 
   /// show the calendar
   Widget showCalendar() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.46,
+      height: MediaQuery.of(context).size.height * 0.4,
       width: MediaQuery.of(context).size.width * 0.99,
       decoration: BoxDecoration(
           gradient: gradient,
@@ -45,29 +46,6 @@ class _RecordsState extends State<Records> {
         children: [
           SizedBox(height: MediaQuery.of(context).size.height * 0.08),
           Container(
-            height: MediaQuery.of(context).size.height * 0.05,
-            width: MediaQuery.of(context).size.width * 1,
-            padding: const EdgeInsets.only(left: 20),
-            decoration: const BoxDecoration(
-              color: Colors.transparent,
-            ),
-            child: const Align(
-              alignment: Alignment.centerLeft,
-              /*child: GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                          builder: ((context) => const HomePage())));
-                },
-                child: const Icon(
-                  Icons.arrow_back_ios,
-                  color: Colors.white,
-                ),
-              ),*/
-            ),
-          ),
-          Container(
               height: MediaQuery.of(context).size.height * 0.32,
               width: MediaQuery.of(context).size.width * 1,
               decoration: const BoxDecoration(
@@ -76,13 +54,13 @@ class _RecordsState extends State<Records> {
               child: CalendarDatePicker2(
                 config: CalendarDatePicker2Config(
                     dayTextStyle: const TextStyle(color: Colors.white),
-                    selectedDayHighlightColor: Colors.white,
+                    selectedDayHighlightColor: Colors.black,
                     selectedDayTextStyle: const TextStyle(
                         fontWeight: FontWeight.w600, color: Colors.black),
                     todayTextStyle: const TextStyle(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w900,
-                        fontSize: 16),
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                        fontSize: 12),
                     controlsTextStyle: const TextStyle(
                         color: Colors.black, fontWeight: FontWeight.w600)),
                 value: [],
@@ -99,7 +77,7 @@ class _RecordsState extends State<Records> {
   /// show the operations recording container
   Widget operationsRecording() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.45,
+      height: MediaQuery.of(context).size.height * 0.52,
       width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(
         color: Colors.transparent,
@@ -109,7 +87,7 @@ class _RecordsState extends State<Records> {
         children: [
           Container(
             height: MediaQuery.of(context).size.height * 0.05,
-            width: MediaQuery.of(context).size.width * 0.7,
+            width: MediaQuery.of(context).size.width * 0.9,
             margin: const EdgeInsets.only(bottom: 10),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -145,7 +123,12 @@ class _RecordsState extends State<Records> {
                 });
               },
               decoration: const InputDecoration(
-                hintText: "Record title",
+                icon: Icon(
+                  Icons.title_sharp,
+                  color: Colors.black,
+                  size: 25,
+                ),
+                hintText: "Title",
                 contentPadding: EdgeInsets.all(10.0),
                 hintStyle:
                     TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
@@ -171,7 +154,50 @@ class _RecordsState extends State<Records> {
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.25,
+            height: MediaQuery.of(context).size.height * 0.05,
+            width: MediaQuery.of(context).size.width * 0.9,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: TextField(
+              onChanged: (value) {
+                setState(() {
+                  recordAmount = value;
+                });
+              },
+              decoration: const InputDecoration(
+                icon: Icon(
+                  Icons.price_check,
+                  color: Colors.black,
+                  size: 25,
+                ),
+                hintText: "Amount",
+                contentPadding: EdgeInsets.all(10.0),
+                hintStyle:
+                    TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
+                border: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 126, 126, 126),
+                    width: 0.5,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Container(
+            height: MediaQuery.of(context).size.height * 0.3,
             width: MediaQuery.of(context).size.width * 0.9,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -184,7 +210,7 @@ class _RecordsState extends State<Records> {
               },
               maxLines: 20,
               decoration: const InputDecoration(
-                hintText: "Describe your record",
+                hintText: "Details",
                 contentPadding: EdgeInsets.all(10.0),
                 hintStyle:
                     TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
@@ -274,6 +300,7 @@ class _RecordsState extends State<Records> {
     await ref.child(recordDate).set({
       "date": recordDate,
       "title": recordTitle,
+      "amount": recordAmount,
       "description": recordDescription
     });
   }
@@ -324,8 +351,7 @@ class _RecordsState extends State<Records> {
                         Navigator.push(
                             context,
                             MaterialPageRoute(
-                                builder: ((context) =>
-                                    HomePage(userGmail: widget.userGmail))));
+                                builder: ((context) => const HomePage())));
                       },
                       style: ElevatedButton.styleFrom(
                           backgroundColor: Colors.grey.shade200,

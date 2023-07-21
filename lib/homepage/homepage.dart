@@ -6,24 +6,23 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
 import 'package:recordkeeping/Account/account_ui.dart';
+import 'package:recordkeeping/calculator/calculator_ui.dart';
 import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/record/allrecords.dart';
 import 'package:recordkeeping/record/record.dart';
 import 'package:recordkeeping/reports/reports.dart';
-import 'dart:io';
 
 import '../AuthenticationFirebase/auth.dart';
 
 class HomePage extends StatefulWidget {
-  String userGmail = "";
-  HomePage({super.key, required this.userGmail});
+  const HomePage({super.key});
 
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  /// variable to store the gradient color for containers
+  /// GRADIENT
   Gradient gradient = const LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
@@ -33,8 +32,11 @@ class _HomePageState extends State<HomePage> {
     ],
   );
 
-  /// String varaible for storing the fetched username
+  /// USERNAME
   String userName = "";
+
+  /// USER GMAIL
+  String userGmail = "";
 
   /// variable to store default period for the manual report request
   String selectedOption = "1 DAY";
@@ -203,12 +205,12 @@ class _HomePageState extends State<HomePage> {
                   if (value == 'logout') {
                     signOut();
                   } else if (value == 'myaccount') {
-                    Navigator.push(
+                    /*Navigator.push(
                       context,
                       MaterialPageRoute(
                           builder: (context) =>
-                              AccountUI(userGmail: widget.userGmail)),
-                    );
+                              AccountUI(userGmail: userGmail)),
+                    );*/
                   }
                 },
                 itemBuilder: (BuildContext context) => [
@@ -227,13 +229,6 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ],
-              ),
-              Text(
-                userName,
-                style: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 13),
               ),
             ],
           ),
@@ -272,7 +267,7 @@ class _HomePageState extends State<HomePage> {
                         context,
                         MaterialPageRoute(
                             builder: ((context) => AllRecords(
-                                  userGmail: widget.userGmail,
+                                  userGmail: userGmail,
                                 ))));
                   },
                   child: Row(
@@ -308,14 +303,14 @@ class _HomePageState extends State<HomePage> {
                             context,
                             MaterialPageRoute(
                                 builder: ((context) => AllRecords(
-                                      userGmail: widget.userGmail,
+                                      userGmail: userGmail,
                                     ))));
                       },
                       child: Container(
-                        height: MediaQuery.of(context).size.height * 0.07,
                         width: MediaQuery.of(context).size.width * 0.9,
                         margin: const EdgeInsets.only(bottom: 13),
-                        padding: const EdgeInsets.only(left: 5, right: 5),
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 8, top: 10, bottom: 10),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           boxShadow: [
@@ -329,25 +324,38 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ],
                         ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
                               children: [
-                                GradientIcon(
-                                    Icons.view_comfy_alt, 25, gradient),
-                                const SizedBox(width: 10),
+                                Row(
+                                  children: [
+                                    GradientIcon(
+                                        Icons.view_comfy_alt, 25, gradient),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      recordsTitles[index]["title"],
+                                      style: const TextStyle(
+                                          fontSize: 16,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w400),
+                                    ),
+                                  ],
+                                ),
                                 Text(
-                                  recordsTitles[index]["title"],
+                                  recordsTitles[index]["date"],
                                   style: const TextStyle(
                                       fontSize: 16,
                                       color: Colors.black,
-                                      fontWeight: FontWeight.w400),
+                                      fontWeight: FontWeight.w300),
                                 ),
                               ],
                             ),
+                            SizedBox(height: 5),
                             Text(
-                              recordsTitles[index]["date"],
+                              "(Ksh ${recordsTitles[index]["amount"]})",
                               style: const TextStyle(
                                   fontSize: 16,
                                   color: Colors.black,
@@ -382,7 +390,7 @@ class _HomePageState extends State<HomePage> {
                   context,
                   MaterialPageRoute(
                       builder: ((context) => Reports(
-                            userGmail: widget.userGmail,
+                            userGmail: userGmail,
                           ))));
             },
             child: Container(
@@ -421,9 +429,7 @@ class _HomePageState extends State<HomePage> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: ((context) => Reports(
-                            userGmail: widget.userGmail,
-                          ))));
+                      builder: ((context) => const CalculatorUI())));
             },
             child: Container(
               height: MediaQuery.of(context).size.height * 0.12,
@@ -445,7 +451,7 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   const Text(
-                    "CALCULATOR",
+                    "CALCULATE",
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
@@ -469,7 +475,7 @@ class _HomePageState extends State<HomePage> {
             context,
             MaterialPageRoute(
                 builder: ((context) => Records(
-                      userGmail: widget.userGmail,
+                      userGmail: userGmail,
                     ))));
       },
       child: Container(
@@ -510,11 +516,8 @@ class _HomePageState extends State<HomePage> {
   /// initial function of the screen
   @override
   void initState() {
-    var box = Hive.box('Gmail');
-    box.put('name', 'David');
-    var name = box.get('name');
-    print('Name: $name');
-    print(widget.userGmail);
+    ///fetch user gmail
+    fetchUserGmail();
 
     /// fetch username
     fetchUserName();
@@ -580,7 +583,7 @@ class _HomePageState extends State<HomePage> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("users")
-        .child(removeSpecialCharacters(widget.userGmail))
+        .child(removeSpecialCharacters(userGmail))
         .child("username");
     databaseReference.onValue.listen((event) {
       setState(() {
@@ -602,7 +605,7 @@ class _HomePageState extends State<HomePage> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("info")
-        .child(removeSpecialCharacters(widget.userGmail))
+        .child(removeSpecialCharacters(userGmail))
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
@@ -675,7 +678,7 @@ class _HomePageState extends State<HomePage> {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
         .child("info")
-        .child(removeSpecialCharacters(widget.userGmail))
+        .child(removeSpecialCharacters(userGmail))
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
@@ -698,7 +701,7 @@ class _HomePageState extends State<HomePage> {
   /// THREE months
   void getReportContent_ThreeMonths(String startDate, String endDate) async {
     DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("info").child(widget.userGmail);
+        FirebaseDatabase.instance.ref().child("info").child(userGmail);
     databaseReference
         .child("records")
         .orderByChild('date')
@@ -728,10 +731,8 @@ class _HomePageState extends State<HomePage> {
 
   /// SIX months
   void getReportContent_SixMonths(String startDate, String endDate) async {
-    Query databaseReference = FirebaseDatabase.instance
-        .ref()
-        .child("records")
-        .child(widget.userGmail);
+    Query databaseReference =
+        FirebaseDatabase.instance.ref().child("records").child(userGmail);
     databaseReference
         .orderByChild('date')
         .startAt(startDate)
@@ -748,10 +749,8 @@ class _HomePageState extends State<HomePage> {
 
   /// TWELVE months
   void getReportContent_TwelveMonths(String startDate, String endDate) async {
-    Query databaseReference = FirebaseDatabase.instance
-        .ref()
-        .child("records")
-        .child(widget.userGmail);
+    Query databaseReference =
+        FirebaseDatabase.instance.ref().child("records").child(userGmail);
     databaseReference
         .orderByChild('date')
         .startAt(startDate)
@@ -814,5 +813,14 @@ class _HomePageState extends State<HomePage> {
   /// Sign out
   Future<void> signOut() async {
     await Auth().signOut();
+  }
+
+  /// fetch user gmail
+  void fetchUserGmail() {
+    var localDatabase = Hive.box('Gmail');
+    setState(() {
+      userGmail = localDatabase.get('gmail');
+    });
+    print('Name: $userGmail');
   }
 }

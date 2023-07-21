@@ -2,6 +2,9 @@
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:recordkeeping/gradient/gradient_class.dart';
+
+import '../homepage/homepage.dart';
 
 class AccountUI extends StatefulWidget {
   String userGmail = "";
@@ -12,6 +15,16 @@ class AccountUI extends StatefulWidget {
 }
 
 class _AccountUIState extends State<AccountUI> {
+  /// GRADIENT
+  Gradient gradient = const LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [
+      Colors.orange,
+      Colors.purple,
+    ],
+  );
+
   /// string varaible to store the new username
   String newUsername = "";
 
@@ -99,6 +112,7 @@ class _AccountUIState extends State<AccountUI> {
                   onPressed: () {
                     print("Chnage username");
                     changeUsername_Function();
+                    success(context);
                   },
                   style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.grey.shade200,
@@ -173,5 +187,49 @@ class _AccountUIState extends State<AccountUI> {
   String removeSpecialCharacters(String input) {
     final regex = RegExp(r'[^\w\s]');
     return input.replaceAll(regex, '');
+  }
+
+  /// SUCCESS DIALOG
+  void success(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+              height: MediaQuery.of(context).size.height * 0.2,
+              width: MediaQuery.of(context).size.width * 1,
+              decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.all(Radius.circular(10))),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children: [
+                  const Text(
+                    "Username changed successfully",
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w400,
+                        fontSize: 14),
+                  ),
+                  GradientIcon(
+                      Icons.check_circle_outline_rounded, 50, gradient),
+                  const SizedBox(height: 10),
+                  ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => const HomePage())));
+                      },
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.grey.shade200,
+                          foregroundColor: Colors.black,
+                          shadowColor: Colors.grey),
+                      child: const Text("HOME"))
+                ],
+              )),
+        );
+      },
+    );
   }
 }

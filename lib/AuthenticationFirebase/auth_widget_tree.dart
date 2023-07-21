@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:recordkeeping/AuthenticationFirebase/auth.dart';
 import 'package:recordkeeping/AuthenticationFirebase/auth_login.dart';
-import 'package:recordkeeping/AuthenticationFirebase/auth_variables.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
 
 class AuthWidgetTree extends StatefulWidget {
@@ -23,7 +22,7 @@ class _AuthWidgetTreeState extends State<AuthWidgetTree> {
       stream: Auth().authStateChange,
       builder: (context, snapshot) {
         if (snapshot.hasData) {
-          return HomePage(userGmail: AuthVariables().getUserGmail);
+          return const HomePage();
         } else {
           return const LoginPage();
         }

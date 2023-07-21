@@ -83,20 +83,32 @@ class _AllRecordsState extends State<AllRecords> {
                         Text(
                           recordsDetails[index]["title"],
                           style: const TextStyle(
-                              fontSize: 17,
+                              fontSize: 15,
                               color: Colors.black,
-                              fontWeight: FontWeight.w300),
+                              fontWeight: FontWeight.w500),
                         ),
                         Text(
                           "( ${recordsDetails[index]["date"]} )",
                           style: const TextStyle(
-                              fontSize: 16,
+                              fontSize: 15,
                               color: Colors.black,
-                              fontWeight: FontWeight.w300),
+                              fontWeight: FontWeight.w500),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 10),
+                    Align(
+                      alignment: Alignment.centerLeft,
+                      child: Text(
+                        "(Ksh ${recordsDetails[index]["amount"]})",
+                        style: const TextStyle(
+                            wordSpacing: 2,
+                            fontSize: 15,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w300),
+                      ),
+                    ),
+                    const SizedBox(height: 10),
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
@@ -160,6 +172,7 @@ class _AllRecordsState extends State<AllRecords> {
           recordsDetails.add(data.value);
         });
       }
+      print(recordsDetails);
       print(recordsDetails[0]["title"]);
       print(recordsDetails[0]["description"]);
     });

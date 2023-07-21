@@ -2,6 +2,7 @@
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:recordkeeping/AuthenticationFirebase/auth.dart';
 
 class LoginPage extends StatefulWidget {
@@ -35,6 +36,7 @@ class _LoginPageState extends State<LoginPage> {
         email: controllerEmail.text,
         password: controllerPassword.text,
       );
+      saveGmail(controllerEmail.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -48,6 +50,7 @@ class _LoginPageState extends State<LoginPage> {
     try {
       await Auth().createUserWithEmailAndPassowrd(
           email: controllerEmail.text, password: controllerPassword.text);
+      saveGmail(controllerEmail.text);
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -142,6 +145,12 @@ class _LoginPageState extends State<LoginPage> {
     );
 
     ScaffoldMessenger.of(context).showSnackBar(snackBar);
+  }
+
+  /// save the user gmail to local database
+  void saveGmail(String userGmail) {
+    var localDatabase = Hive.box('Gmail');
+    localDatabase.put('gmail', userGmail);
   }
 
   @override
