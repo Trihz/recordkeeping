@@ -1,6 +1,5 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:hive/hive.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:recordkeeping/splashscreen/splashscreen_ui.dart';
 
@@ -11,6 +10,9 @@ Future<void> main() async {
   /// Initialize Hive
   await Hive.initFlutter();
   await Hive.openBox('Gmail');
+  await Hive.openBox('Date3');
+  await Hive.openBox('Date6');
+  await Hive.openBox('Date12');
   runApp(const MyApp());
 }
 

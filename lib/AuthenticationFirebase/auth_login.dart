@@ -37,6 +37,7 @@ class _LoginPageState extends State<LoginPage> {
         password: controllerPassword.text,
       );
       saveGmail(controllerEmail.text);
+      checkReferenceDate();
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -51,6 +52,7 @@ class _LoginPageState extends State<LoginPage> {
       await Auth().createUserWithEmailAndPassowrd(
           email: controllerEmail.text, password: controllerPassword.text);
       saveGmail(controllerEmail.text);
+      checkReferenceDate();
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -151,6 +153,58 @@ class _LoginPageState extends State<LoginPage> {
   void saveGmail(String userGmail) {
     var localDatabase = Hive.box('Gmail');
     localDatabase.put('gmail', userGmail);
+  }
+
+  /// get current date
+  /// function to save the reference date is called within this function
+  void getCurrentDate() {
+    DateTime currentDate = DateTime.now();
+    String currentMonth = currentDate.month.toString();
+    String currentDay = currentDate.day.toString();
+    if (currentMonth.length == 1) {
+      currentMonth = "0$currentMonth";
+    }
+    if (currentDay.length == 1) {
+      currentDay = "0$currentMonth";
+    }
+    String formattedDate = "${currentDate.year}-$currentMonth-$currentDay";
+    saveReferenceDate_3(formattedDate);
+    saveReferenceDate_6(formattedDate);
+    saveReferenceDate_12(formattedDate);
+    print(formattedDate);
+  }
+
+  /// function to check whether the reference date has already been set
+  /// the reference date should be set only once
+  /// thus the app has to check wether the date has been set each time during login or setup to avoid setting up the reference date again
+  /// getCurrentDate() function is called within this function
+  void checkReferenceDate() {
+    var localDatabase = Hive.box('Date');
+    String referenceDate = localDatabase.get('date');
+    if (referenceDate.isEmpty) {
+      getCurrentDate();
+      print("FALSE");
+    } else {
+      print("TRUE");
+    }
+  }
+
+  /// save current date to the database
+  void saveReferenceDate_3(String referenceDate) {
+    var localDatabase = Hive.box('Date3');
+    localDatabase.put('date', referenceDate);
+  }
+
+  /// save current date to the database
+  void saveReferenceDate_6(String referenceDate) {
+    var localDatabase = Hive.box('Date6');
+    localDatabase.put('date', referenceDate);
+  }
+
+  /// save current date to the database
+  void saveReferenceDate_12(String referenceDate) {
+    var localDatabase = Hive.box('Date12');
+    localDatabase.put('date', referenceDate);
   }
 
   @override

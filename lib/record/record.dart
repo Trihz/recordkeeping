@@ -345,19 +345,7 @@ class _RecordsState extends State<Records> {
                   ),
                   GradientIcon(
                       Icons.check_circle_outline_rounded, 50, gradient),
-                  const SizedBox(height: 10),
-                  ElevatedButton(
-                      onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: ((context) => const HomePage())));
-                      },
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.grey.shade200,
-                          foregroundColor: Colors.black,
-                          shadowColor: Colors.grey),
-                      child: Text("HOME"))
+                  const SizedBox(height: 10)
                 ],
               )),
         );

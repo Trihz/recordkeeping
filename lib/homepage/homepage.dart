@@ -1,4 +1,4 @@
-// ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable, prefer_typing_uninitialized_variables
+// ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable, prefer_typing_uninitialized_variables, unnecessary_brace_in_string_interps, unused_local_variable
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
@@ -38,6 +38,14 @@ class _HomePageState extends State<HomePage> {
   /// USER GMAIL
   String userGmail = "";
 
+  /// REFERENCE DATES
+  String referenceDate_3 = "";
+  String referenceDate_6 = "";
+  String referenceDate_12 = "";
+
+  /// TODAY DATE
+  String todayDate = "";
+
   /// variable to store default period for the manual report request
   String selectedOption = "1 DAY";
 
@@ -50,17 +58,23 @@ class _HomePageState extends State<HomePage> {
   List twelveMonthsData = [];
 
   /// variables to store the start and end dates of the 3,6 and 12 months period
-  String threeMonths_Start = "2023-07-14";
-  String sixMonths_Start = "2023-07-14";
-  String twelveMonths_Start = "2023-07-14";
+  String threeMonths_Start = "";
+  String sixMonths_Start = "";
+  String twelveMonths_Start = "";
   String threeMonths_End = "";
   String sixMonths_End = "";
   String twelveMonths_End = "";
 
   /// variable to store the report content, type of report that has been generated and the report periods
-  String reportType_ToDatabase = "";
-  String reportPeriod_ToDatabase = "";
-  List reportContent_ToDatabase = [];
+  String reportType_ToDatabase_3 = "";
+  String reportPeriod_ToDatabase_3 = "";
+  List reportContent_ToDatabase_3 = [];
+  String reportType_ToDatabase_6 = "";
+  String reportPeriod_ToDatabase_6 = "";
+  List reportContent_ToDatabase_6 = [];
+  String reportType_ToDatabase_12 = "";
+  String reportPeriod_ToDatabase_12 = "";
+  List reportContent_ToDatabase_12 = [];
 
   /// string variable to store the date clicked
   String clickedDate = "";
@@ -516,25 +530,40 @@ class _HomePageState extends State<HomePage> {
   /// initial function of the screen
   @override
   void initState() {
-    ///fetch user gmail
+    /// GMAIL
     fetchUserGmail();
 
-    /// fetch username
-    fetchUserName();
-
-    /// current month and year
+    /// CURRENT MONTH & YEAR
     getCurrentMonthYear();
+
+    print("**************************");
+
+    /// REFERENCE DATE
+    fetchReferenceDate_3();
+    fetchReferenceDate_6();
+    fetchReferenceDate_12();
+
+    print("**************************");
+
+    /// TODAY DATE
+    fetchTodayDate();
+
+    /// START DATES
+    threeMonths_Start = referenceDate_3;
+    sixMonths_Start = referenceDate_6;
+    twelveMonths_Start = referenceDate_12;
+
+    /// END DATES
+    evaluateEndDates();
+
+    /// COMPARISON
+    reportDatesComparison();
 
     /// titles of the record
     getRecordTitles();
 
     /// number of `day`s in current month
     getNumberOfDays();
-
-    evaluateThreeMonthsPeriod();
-    evaluateSixMonthsPeriod();
-    evaluateTwelveMonthsPeriod();
-    getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
 
     super.initState();
   }
@@ -577,20 +606,6 @@ class _HomePageState extends State<HomePage> {
 
   /// Auth User object
   final User? user = Auth().currentUser;
-
-  /// Get username
-  void fetchUserName() {
-    DatabaseReference databaseReference = FirebaseDatabase.instance
-        .ref()
-        .child("users")
-        .child(removeSpecialCharacters(userGmail))
-        .child("username");
-    databaseReference.onValue.listen((event) {
-      setState(() {
-        userName = event.snapshot.value.toString();
-      });
-    });
-  }
 
   /// Remove special characters
   String removeSpecialCharacters(String input) {
@@ -700,8 +715,17 @@ class _HomePageState extends State<HomePage> {
 
   /// THREE months
   void getReportContent_ThreeMonths(String startDate, String endDate) async {
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("info").child(userGmail);
+    /// Set period and dates
+    setState(() {
+      reportType_ToDatabase_3 = "3 Months";
+      reportPeriod_ToDatabase_3 = "( $startDate - $endDate)";
+    });
+
+    /// Generate the report
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(removeSpecialCharacters(userGmail));
     databaseReference
         .child("records")
         .orderByChild('date')
@@ -709,64 +733,100 @@ class _HomePageState extends State<HomePage> {
         .endAt(endDate)
         .onValue
         .listen((DatabaseEvent event) async {
-      setState(() {
-        contentOfReport = event.snapshot.value;
-      });
-      print(contentOfReport);
-      setState(() {
-        reportType_ToDatabase = "3 Months";
-        reportPeriod_ToDatabase = "( $startDate - $endDate)";
-        reportContent_ToDatabase.add(contentOfReport);
-      });
-      print(reportType_ToDatabase);
-      print(reportPeriod_ToDatabase);
-      print(reportContent_ToDatabase);
+      for (var data in event.snapshot.children) {
+        reportContent_ToDatabase_3.add(data.value);
+      }
+      print("Report content: ${reportContent_ToDatabase_3}");
+      print(reportContent_ToDatabase_3[0]["date"]);
+
+      /// record the  report
       await databaseReference.child("reports").push().set({
-        "reportType": reportType_ToDatabase,
-        "reportPeriod": reportPeriod_ToDatabase,
-        "reportContent": contentOfReport.toString()
+        "reportType": reportType_ToDatabase_3,
+        "reportPeriod": reportPeriod_ToDatabase_3,
+        "reportContent": reportContent_ToDatabase_3
       });
     });
   }
 
   /// SIX months
   void getReportContent_SixMonths(String startDate, String endDate) async {
-    Query databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(userGmail);
+    /// Set period and dates
+    setState(() {
+      reportType_ToDatabase_6 = "6 Months";
+      reportPeriod_ToDatabase_6 = "( $startDate - $endDate)";
+    });
+
+    /// Generate the report
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(removeSpecialCharacters(userGmail));
     databaseReference
+        .child("records")
         .orderByChild('date')
         .startAt(startDate)
         .endAt(endDate)
         .onValue
-        .listen((DatabaseEvent event) {
-      final contentOfReport = event.snapshot.value;
-
-      if (contentOfReport != null) {
-        print(contentOfReport);
+        .listen((DatabaseEvent event) async {
+      for (var data in event.snapshot.children) {
+        reportContent_ToDatabase_6.add(data.value);
       }
+      print("Report content: ${reportContent_ToDatabase_6}");
+      print(reportContent_ToDatabase_6[0]["date"]);
+
+      /// record the  report
+      await databaseReference.child("reports").push().set({
+        "reportType": reportType_ToDatabase_6,
+        "reportPeriod": reportPeriod_ToDatabase_6,
+        "reportContent": reportContent_ToDatabase_6
+      });
     });
   }
 
   /// TWELVE months
   void getReportContent_TwelveMonths(String startDate, String endDate) async {
-    Query databaseReference =
-        FirebaseDatabase.instance.ref().child("records").child(userGmail);
+    /// Set period and dates
+    setState(() {
+      reportType_ToDatabase_12 = "12 Months";
+      reportPeriod_ToDatabase_12 = "( $startDate - $endDate)";
+    });
+
+    /// Generate the report
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(removeSpecialCharacters(userGmail));
     databaseReference
+        .child("records")
         .orderByChild('date')
         .startAt(startDate)
         .endAt(endDate)
         .onValue
-        .listen((DatabaseEvent event) {
-      final contentOfReport = event.snapshot.value;
-
-      if (contentOfReport != null) {
-        print(contentOfReport);
+        .listen((DatabaseEvent event) async {
+      for (var data in event.snapshot.children) {
+        reportContent_ToDatabase_12.add(data.value);
       }
+      print("Report content: ${reportContent_ToDatabase_12}");
+      print(reportContent_ToDatabase_12[0]["date"]);
+
+      /// record the  report
+      await databaseReference.child("reports").push().set({
+        "reportType": reportType_ToDatabase_12,
+        "reportPeriod": reportPeriod_ToDatabase_12,
+        "reportContent": reportContent_ToDatabase_12
+      });
     });
   }
 
+  /// END dates
+  void evaluateEndDates() {
+    evaluateThreeEndDate();
+    evaluateSixEndDate();
+    evaluateTwelveEndDate();
+  }
+
   /// THREE months
-  void evaluateThreeMonthsPeriod() {
+  void evaluateThreeEndDate() {
     DateTime startDate = DateTime.parse(threeMonths_Start);
     DateTime afterThreeMonths = startDate.add(const Duration(days: 3 * 30));
 
@@ -776,7 +836,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// SIX months
-  void evaluateSixMonthsPeriod() {
+  void evaluateSixEndDate() {
     DateTime startDate = DateTime.parse(sixMonths_Start);
     DateTime afterSixMonths = startDate.add(const Duration(days: 6 * 30));
 
@@ -786,28 +846,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// TWELVE months
-  void evaluateTwelveMonthsPeriod() {
+  void evaluateTwelveEndDate() {
     DateTime startDate = DateTime.parse(twelveMonths_Start);
     DateTime afterTwelveMonths = startDate.add(const Duration(days: 365));
 
     twelveMonths_End = DateFormat('yyyy-MM-dd').format(afterTwelveMonths);
     print(twelveMonths_Start);
     print(twelveMonths_End);
-  }
-
-  /// record the generated report if any
-  void recordReport() async {
-    print("***************************");
-    print(reportType_ToDatabase);
-    print(reportPeriod_ToDatabase);
-    print(reportContent_ToDatabase);
-    DatabaseReference databaseReference =
-        FirebaseDatabase.instance.ref().child("reports");
-    await databaseReference.child(reportType_ToDatabase).set({
-      "reportType": reportType_ToDatabase,
-      "reportPeriod": reportPeriod_ToDatabase,
-      "reportContent": reportContent_ToDatabase
-    });
   }
 
   /// Sign out
@@ -822,5 +867,113 @@ class _HomePageState extends State<HomePage> {
       userGmail = localDatabase.get('gmail');
     });
     print('Name: $userGmail');
+  }
+
+  /// fetch reference date
+  void fetchReferenceDate_3() {
+    var localDatabase = Hive.box('Date3');
+    setState(() {
+      referenceDate_3 = localDatabase.get('date');
+    });
+    print("Reference date: ${localDatabase.get('date')}");
+  }
+
+  /// fetch reference date
+  void fetchReferenceDate_6() {
+    var localDatabase = Hive.box('Date6');
+    setState(() {
+      referenceDate_6 = localDatabase.get('date');
+    });
+    print("Reference date: ${localDatabase.get('date')}");
+  }
+
+  /// fetch reference date
+  void fetchReferenceDate_12() {
+    var localDatabase = Hive.box('Date12');
+    setState(() {
+      referenceDate_12 = localDatabase.get('date');
+    });
+    print("Reference date: ${localDatabase.get('date')}");
+  }
+
+  /// fetch today date
+  void fetchTodayDate() {
+    DateTime currentDate = DateTime.now();
+    String currentMonth = currentDate.month.toString();
+    String currentDay = currentDate.day.toString();
+    if (currentMonth.length == 1) {
+      currentMonth = "0$currentMonth";
+    }
+    if (currentDay.length == 1) {
+      currentDay = "0$currentDay";
+    }
+    setState(() {
+      todayDate = "${currentDate.year}-$currentMonth-$currentDay";
+    });
+    print(todayDate);
+  }
+
+  /// compare today's date and the end date
+  void reportDatesComparison() {
+    setState(() {
+      todayDate = "2023-10-23";
+    });
+    print("End date(3): ${threeMonths_End}");
+    print("End date(6): ${sixMonths_End}");
+    print("End date(12): ${twelveMonths_End}");
+    print("Today's date: ${todayDate}");
+
+    // YEAR,MONTH,DAY
+    int year_today = int.parse(todayDate.substring(0, 4));
+    int month_today = int.parse(todayDate.substring(5, 7));
+    int day_today = int.parse(todayDate.substring(8, 10));
+    int year_3 = int.parse(threeMonths_End.substring(0, 4));
+    int month_3 = int.parse(threeMonths_End.substring(5, 7));
+    int day_3 = int.parse(threeMonths_End.substring(8, 10));
+    int year_6 = int.parse(sixMonths_End.substring(0, 4));
+    int month_6 = int.parse(sixMonths_End.substring(5, 7));
+    int day_6 = int.parse(sixMonths_End.substring(8, 10));
+    int year_12 = int.parse(twelveMonths_End.substring(0, 4));
+    int month_12 = int.parse(twelveMonths_End.substring(5, 7));
+    int day_12 = int.parse(twelveMonths_End.substring(8, 10));
+
+    /// 3 Months
+    if (year_today > year_3) {
+      getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
+    } else {
+      if (year_today == year_3) {
+        if (month_today >= month_3) {
+          if (day_today >= day_3) {
+            getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
+          } else {}
+        } else {}
+      } else {}
+    }
+
+    /// 6 Months
+    if (year_today > year_6) {
+      getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
+    } else {
+      if (year_today == year_6) {
+        if (month_today >= month_6) {
+          if (day_today >= day_6) {
+            getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
+          } else {}
+        } else {}
+      } else {}
+    }
+
+    /// 12 Months
+    if (year_today > year_12) {
+      getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
+    } else {
+      if (year_today == year_12) {
+        if (month_today >= month_12) {
+          if (day_today >= day_12) {
+            getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
+          } else {}
+        } else {}
+      } else {}
+    }
   }
 }

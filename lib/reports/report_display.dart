@@ -1,8 +1,18 @@
+// ignore_for_file: must_be_immutable, avoid_print, prefer_const_constructors
+
 import 'package:flutter/material.dart';
+import 'package:simple_gradient_text/simple_gradient_text.dart';
 
 class ReportDisplay extends StatefulWidget {
   List contentOfReport = [];
-  ReportDisplay({super.key, required this.contentOfReport});
+  String typeOfReport = "";
+  String periodOfReport = "";
+
+  ReportDisplay(
+      {super.key,
+      required this.contentOfReport,
+      required this.typeOfReport,
+      required this.periodOfReport});
 
   @override
   State<ReportDisplay> createState() => _ReportDisplayState();
@@ -10,10 +20,10 @@ class ReportDisplay extends StatefulWidget {
 
 class _ReportDisplayState extends State<ReportDisplay> {
   /// widget to display the content of the record
-  Widget recordContent() {
+  Widget reportContentDisplay() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.75,
-      width: MediaQuery.of(context).size.width * 0.9,
+      height: MediaQuery.of(context).size.height * 0.8,
+      width: MediaQuery.of(context).size.width * 0.92,
       padding: const EdgeInsets.only(top: 15, bottom: 10),
       decoration: BoxDecoration(
         color: Colors.white,
@@ -32,37 +42,25 @@ class _ReportDisplayState extends State<ReportDisplay> {
         children: [
           Row(
             mainAxisAlignment: MainAxisAlignment.center,
-            children: const [
-              Text(
-                "Period:",
-                style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontWeight: FontWeight.w400,
-                    fontSize: 18),
-              ),
-              SizedBox(width: 10),
-              Text(
-                "3 Months",
-                style: TextStyle(
-                    color: Colors.blueAccent,
-                    fontWeight: FontWeight.w500,
-                    fontSize: 18),
-              ),
+            children: [
+              GradientText("Period:",
+                  style: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
+                  colors: const [Colors.orange, Colors.purple]),
+              const SizedBox(width: 10),
+              GradientText(widget.typeOfReport,
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 15),
+                  colors: const [Colors.orange, Colors.purple]),
             ],
           ),
-          const Text(
-            "(10-01-2022)  -  (10-04-2022)",
-            style: TextStyle(
-                color: Colors.blueAccent,
-                fontWeight: FontWeight.w300,
-                fontSize: 18),
-          ),
+          GradientText(widget.periodOfReport,
+              style: TextStyle(fontWeight: FontWeight.w300, fontSize: 15),
+              colors: const [Colors.orange, Colors.purple]),
           const Divider(color: Color.fromARGB(255, 164, 164, 164)),
           Container(
-            height: MediaQuery.of(context).size.height * 0.58,
+            height: MediaQuery.of(context).size.height * 0.68,
             width: MediaQuery.of(context).size.width * 1,
             decoration: const BoxDecoration(
-              color: Colors.white,
+              color: Colors.transparent,
             ),
             child: ListView.builder(
                 padding: const EdgeInsets.all(10),
@@ -70,32 +68,81 @@ class _ReportDisplayState extends State<ReportDisplay> {
                 itemBuilder: ((context, index) {
                   return Container(
                     width: MediaQuery.of(context).size.width * 1,
-                    margin: const EdgeInsets.only(bottom: 15),
-                    padding: const EdgeInsets.only(left: 20, right: 20),
+                    margin: const EdgeInsets.only(bottom: 20),
+                    padding: const EdgeInsets.only(left: 5, right: 5),
                     decoration: const BoxDecoration(
                       color: Colors.transparent,
                     ),
-                    child: Column(
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            widget.contentOfReport[0][index]["title"],
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w500,
-                                fontSize: 18),
+                        Container(
+                          width: MediaQuery.of(context).size.width * 0.65,
+                          decoration: const BoxDecoration(
+                            color: Colors.transparent,
+                          ),
+                          child: Column(
+                            children: [
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  widget.contentOfReport[0][index]["title"],
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w400,
+                                      fontSize: 14),
+                                ),
+                              ),
+                              const SizedBox(height: 7),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  "(${widget.contentOfReport[0][index]["date"]})",
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 12),
+                                ),
+                              ),
+                              const SizedBox(height: 10),
+                              Align(
+                                alignment: Alignment.centerLeft,
+                                child: Text(
+                                  widget.contentOfReport[0][index]
+                                      ["description"],
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 13),
+                                ),
+                              ),
+                            ],
                           ),
                         ),
-                        const SizedBox(height: 5),
-                        Align(
-                          alignment: Alignment.centerLeft,
-                          child: Text(
-                            widget.contentOfReport[0][index]["description"],
-                            style: const TextStyle(
-                                color: Colors.black,
-                                fontWeight: FontWeight.w300,
-                                fontSize: 18),
+                        Container(
+                          decoration: const BoxDecoration(
+                            color: Colors.transparent,
+                          ),
+                          child: Center(
+                            child: Column(
+                              children: [
+                                Text(
+                                  "Ksh",
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w300,
+                                      fontSize: 13),
+                                ),
+                                const SizedBox(height: 5),
+                                Text(
+                                  widget.contentOfReport[0][index]["amount"],
+                                  style: const TextStyle(
+                                      color: Colors.black,
+                                      fontWeight: FontWeight.w500,
+                                      fontSize: 14),
+                                ),
+                              ],
+                            ),
                           ),
                         ),
                       ],
@@ -103,23 +150,6 @@ class _ReportDisplayState extends State<ReportDisplay> {
                   );
                 })),
           ),
-          Container(
-            height: MediaQuery.of(context).size.height * 0.05,
-            width: MediaQuery.of(context).size.width * 0.5,
-            decoration: const BoxDecoration(
-              color: Colors.white,
-            ),
-            child: ElevatedButton(
-              onPressed: (() {}),
-              style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blueAccent,
-                  foregroundColor: Colors.white),
-              child: const Text(
-                "DOWNLOAD",
-                style: TextStyle(fontWeight: FontWeight.w300, fontSize: 18),
-              ),
-            ),
-          )
         ],
       ),
     );
@@ -128,6 +158,10 @@ class _ReportDisplayState extends State<ReportDisplay> {
   /// initial function of the screen
   @override
   void initState() {
+    print("********************************");
+    print(widget.typeOfReport);
+    print(widget.periodOfReport);
+    print("********************************");
     super.initState();
   }
 
@@ -141,7 +175,7 @@ class _ReportDisplayState extends State<ReportDisplay> {
         color: Colors.white,
       ),
       child: Center(
-        child: recordContent(),
+        child: reportContentDisplay(),
       ),
     ));
   }

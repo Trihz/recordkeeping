@@ -213,77 +213,97 @@ class _ReportsState extends State<Reports> {
                   scrollDirection: Axis.vertical,
                   itemCount: fetchedReports.length,
                   itemBuilder: ((context, index) {
-                    return Container(
-                        height: MediaQuery.of(context).size.height * 0.1,
-                        width: MediaQuery.of(context).size.width * 0.8,
-                        margin: const EdgeInsets.only(
-                            bottom: 15, left: 10, right: 15),
-                        padding: const EdgeInsets.only(
-                            left: 10, right: 10, top: 10, bottom: 10),
-                        decoration: BoxDecoration(
-                            color: Colors.white,
-                            boxShadow: [
-                              BoxShadow(
-                                color: const Color.fromARGB(255, 0, 0, 0)
-                                    .withOpacity(0.1),
-                                spreadRadius: 1,
-                                blurRadius: 1,
-                                offset: const Offset(
-                                    0, 1), // changes position of shadow
-                              ),
-                            ],
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(5))),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceAround,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                              children: [
-                                Text(
-                                  fetchedReports[index]["reportPeriod"],
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 15),
-                                ),
-                                Text(
-                                  fetchedReports[index]["reportType"],
-                                  style: const TextStyle(
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w300,
-                                      fontSize: 15),
+                    return GestureDetector(
+                      onTap: () {
+                        List parameterList1 = [];
+                        String parameterList2 = "";
+                        String parameterList3 = "";
+                        parameterList1
+                            .add(fetchedReports[index]["reportContent"]);
+                        parameterList2 = fetchedReports[index]["reportType"];
+                        parameterList3 = fetchedReports[index]["reportPeriod"];
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: ((context) => ReportDisplay(
+                                      contentOfReport: parameterList1,
+                                      typeOfReport: parameterList2,
+                                      periodOfReport: parameterList3,
+                                    ))));
+                      },
+                      child: Container(
+                          height: MediaQuery.of(context).size.height * 0.1,
+                          width: MediaQuery.of(context).size.width * 0.8,
+                          margin: const EdgeInsets.only(
+                              bottom: 15, left: 10, right: 15),
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, top: 10, bottom: 10),
+                          decoration: BoxDecoration(
+                              color: Colors.white,
+                              boxShadow: [
+                                BoxShadow(
+                                  color: const Color.fromARGB(255, 0, 0, 0)
+                                      .withOpacity(0.1),
+                                  spreadRadius: 1,
+                                  blurRadius: 1,
+                                  offset: const Offset(
+                                      0, 1), // changes position of shadow
                                 ),
                               ],
-                            ),
-                            GestureDetector(
-                              onTap: () {
-                                /*Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: ((context) => ReportDisplay(
-                                              contentOfReport: [
-                                                contentOfReport
-                                              ],
-                                            ))));*/
-                              },
-                              child: Row(
+                              borderRadius:
+                                  const BorderRadius.all(Radius.circular(5))),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceAround,
+                            children: [
+                              Column(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceEvenly,
                                 children: [
-                                  GradientIcon(
-                                      Icons.view_timeline, 30, gradient),
-                                  const SizedBox(width: 5),
-                                  const Text(
-                                    "VIEW",
-                                    style: TextStyle(
+                                  Text(
+                                    fetchedReports[index]["reportPeriod"],
+                                    style: const TextStyle(
                                         color: Colors.black,
-                                        fontWeight: FontWeight.w500,
-                                        fontSize: 13),
+                                        fontWeight: FontWeight.w300,
+                                        fontSize: 15),
+                                  ),
+                                  Text(
+                                    fetchedReports[index]["reportType"],
+                                    style: const TextStyle(
+                                        color: Colors.black,
+                                        fontWeight: FontWeight.w300,
+                                        fontSize: 15),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
-                        ));
+                              GestureDetector(
+                                onTap: () {
+                                  /*Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: ((context) => ReportDisplay(
+                                                contentOfReport: [
+                                                  contentOfReport
+                                                ],
+                                              ))));*/
+                                },
+                                child: Row(
+                                  children: [
+                                    GradientIcon(
+                                        Icons.view_timeline, 30, gradient),
+                                    const SizedBox(width: 5),
+                                    const Text(
+                                      "VIEW",
+                                      style: TextStyle(
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w500,
+                                          fontSize: 13),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          )),
+                    );
                   })),
             ),
           ),
@@ -320,7 +340,7 @@ class _ReportsState extends State<Reports> {
     );
   }
 
-  /// function to fetch all the reports from the database
+  /// FETCH REPORTS
   void fetchAllReports() async {
     DatabaseReference databaseReference = FirebaseDatabase.instance
         .ref()
@@ -328,12 +348,15 @@ class _ReportsState extends State<Reports> {
         .child(removeSpecialCharacters(widget.userGmail))
         .child("reports");
     databaseReference.onValue.listen((event) {
+      /// Get snapshot
       for (var data in event.snapshot.children) {
         setState(() {
           fetchedReports.add(data.value);
         });
       }
       print(fetchedReports);
+
+      /// Evaluate the counts
       for (int x = 0; x < fetchedReports.length; x++) {
         if (fetchedReports[x]["reportType"] == "3 Months") {
           count3++;
