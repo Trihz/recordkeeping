@@ -235,13 +235,13 @@ class _HomePageState extends State<HomePage> {
                       style: TextStyle(color: Colors.black, fontSize: 15),
                     ),
                   ),
-                  const PopupMenuItem<String>(
+                  /*const PopupMenuItem<String>(
                     value: 'myaccount',
                     child: Text(
                       'Account',
                       style: TextStyle(color: Colors.black, fontSize: 15),
                     ),
-                  ),
+                  ),*/
                 ],
               ),
             ],
@@ -733,18 +733,26 @@ class _HomePageState extends State<HomePage> {
         .endAt(endDate)
         .onValue
         .listen((DatabaseEvent event) async {
-      for (var data in event.snapshot.children) {
-        reportContent_ToDatabase_3.add(data.value);
-      }
-      print("Report content: ${reportContent_ToDatabase_3}");
-      print(reportContent_ToDatabase_3[0]["date"]);
+      if (event.snapshot.children.isEmpty) {
+        print("No data for this period");
+      } else {
+        for (var data in event.snapshot.children) {
+          reportContent_ToDatabase_3.add(data.value);
+        }
+        print("Report content: ${reportContent_ToDatabase_3}");
+        print(reportContent_ToDatabase_3[0]["date"]);
 
-      /// record the  report
-      await databaseReference.child("reports").push().set({
-        "reportType": reportType_ToDatabase_3,
-        "reportPeriod": reportPeriod_ToDatabase_3,
-        "reportContent": reportContent_ToDatabase_3
-      });
+        /// record the  report
+        await databaseReference.child("reports").push().set({
+          "reportType": reportType_ToDatabase_3,
+          "reportPeriod": reportPeriod_ToDatabase_3,
+          "reportContent": reportContent_ToDatabase_3
+        });
+      }
+
+      /// Update reference date
+      var localDatabase = Hive.box('Date3');
+      localDatabase.put('date', endDate);
     });
   }
 
@@ -768,18 +776,26 @@ class _HomePageState extends State<HomePage> {
         .endAt(endDate)
         .onValue
         .listen((DatabaseEvent event) async {
-      for (var data in event.snapshot.children) {
-        reportContent_ToDatabase_6.add(data.value);
-      }
-      print("Report content: ${reportContent_ToDatabase_6}");
-      print(reportContent_ToDatabase_6[0]["date"]);
+      if (event.snapshot.children.isEmpty) {
+        print("No data for this period");
+      } else {
+        for (var data in event.snapshot.children) {
+          reportContent_ToDatabase_6.add(data.value);
+        }
+        print("Report content: ${reportContent_ToDatabase_6}");
+        print(reportContent_ToDatabase_6[0]["date"]);
 
-      /// record the  report
-      await databaseReference.child("reports").push().set({
-        "reportType": reportType_ToDatabase_6,
-        "reportPeriod": reportPeriod_ToDatabase_6,
-        "reportContent": reportContent_ToDatabase_6
-      });
+        /// record the  report
+        await databaseReference.child("reports").push().set({
+          "reportType": reportType_ToDatabase_6,
+          "reportPeriod": reportPeriod_ToDatabase_6,
+          "reportContent": reportContent_ToDatabase_6
+        });
+      }
+
+      /// Update reference date
+      var localDatabase = Hive.box('Date6');
+      localDatabase.put('date', endDate);
     });
   }
 
@@ -803,18 +819,25 @@ class _HomePageState extends State<HomePage> {
         .endAt(endDate)
         .onValue
         .listen((DatabaseEvent event) async {
-      for (var data in event.snapshot.children) {
-        reportContent_ToDatabase_12.add(data.value);
-      }
-      print("Report content: ${reportContent_ToDatabase_12}");
-      print(reportContent_ToDatabase_12[0]["date"]);
+      if (event.snapshot.children.isEmpty) {
+        print("No data for this period");
+      } else {
+        for (var data in event.snapshot.children) {
+          reportContent_ToDatabase_12.add(data.value);
+        }
+        print("Report content: ${reportContent_ToDatabase_12}");
+        print(reportContent_ToDatabase_12[0]["date"]);
 
-      /// record the  report
-      await databaseReference.child("reports").push().set({
-        "reportType": reportType_ToDatabase_12,
-        "reportPeriod": reportPeriod_ToDatabase_12,
-        "reportContent": reportContent_ToDatabase_12
-      });
+        /// record the  report
+        await databaseReference.child("reports").push().set({
+          "reportType": reportType_ToDatabase_12,
+          "reportPeriod": reportPeriod_ToDatabase_12,
+          "reportContent": reportContent_ToDatabase_12
+        });
+      }
+
+      var localDatabase = Hive.box('Date12');
+      localDatabase.put('date', endDate);
     });
   }
 
@@ -915,9 +938,6 @@ class _HomePageState extends State<HomePage> {
 
   /// compare today's date and the end date
   void reportDatesComparison() {
-    setState(() {
-      todayDate = "2023-10-23";
-    });
     print("End date(3): ${threeMonths_End}");
     print("End date(6): ${sixMonths_End}");
     print("End date(12): ${twelveMonths_End}");
@@ -942,11 +962,15 @@ class _HomePageState extends State<HomePage> {
       getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
     } else {
       if (year_today == year_3) {
-        if (month_today >= month_3) {
-          if (day_today >= day_3) {
-            getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
+        if (month_today > month_3) {
+          getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
+        } else {
+          if (month_today == month_3) {
+            if (day_today >= day_3) {
+              getReportContent_ThreeMonths(threeMonths_Start, threeMonths_End);
+            } else {}
           } else {}
-        } else {}
+        }
       } else {}
     }
 
@@ -955,11 +979,15 @@ class _HomePageState extends State<HomePage> {
       getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
     } else {
       if (year_today == year_6) {
-        if (month_today >= month_6) {
-          if (day_today >= day_6) {
-            getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
+        if (month_today > month_6) {
+          getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
+        } else {
+          if (month_today == month_6) {
+            if (day_today >= day_6) {
+              getReportContent_SixMonths(sixMonths_Start, sixMonths_End);
+            } else {}
           } else {}
-        } else {}
+        }
       } else {}
     }
 
@@ -968,11 +996,16 @@ class _HomePageState extends State<HomePage> {
       getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
     } else {
       if (year_today == year_12) {
-        if (month_today >= month_12) {
-          if (day_today >= day_12) {
-            getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
+        if (month_today > month_12) {
+          getReportContent_TwelveMonths(twelveMonths_Start, twelveMonths_End);
+        } else {
+          if (month_today == month_12) {
+            if (day_today >= day_12) {
+              getReportContent_TwelveMonths(
+                  twelveMonths_Start, twelveMonths_End);
+            } else {}
           } else {}
-        } else {}
+        }
       } else {}
     }
   }

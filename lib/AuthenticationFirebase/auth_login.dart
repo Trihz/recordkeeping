@@ -179,9 +179,15 @@ class _LoginPageState extends State<LoginPage> {
   /// thus the app has to check wether the date has been set each time during login or setup to avoid setting up the reference date again
   /// getCurrentDate() function is called within this function
   void checkReferenceDate() {
-    var localDatabase = Hive.box('Date');
-    String referenceDate = localDatabase.get('date');
-    if (referenceDate.isEmpty) {
+    var localDatabase1 = Hive.box('Date3');
+    var localDatabase2 = Hive.box('Date6');
+    var localDatabase3 = Hive.box('Date12');
+    String referenceDate1 = localDatabase1.get('date');
+    String referenceDate2 = localDatabase2.get('date');
+    String referenceDate3 = localDatabase3.get('date');
+    if (referenceDate1.isEmpty ||
+        referenceDate2.isEmpty ||
+        referenceDate3.isEmpty) {
       getCurrentDate();
       print("FALSE");
     } else {
