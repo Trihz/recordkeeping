@@ -23,6 +23,9 @@ class _LoginPageState extends State<LoginPage> {
     ],
   );
 
+  // Add this boolean variable to your State class
+  bool isLoading = false;
+
   String? errorMessage = '';
   bool isLogin = true;
 
@@ -31,28 +34,40 @@ class _LoginPageState extends State<LoginPage> {
 
   /// SIGN IN
   Future<void> signInWithEmailAndPassword() async {
+    print("Auth class (SignIn) *********");
+    saveGmail(controllerEmail.text);
+    checkReferenceDate();
+
+    setState(() {
+      isLoading = true; // Show the circular progress indicator
+    });
+
     try {
       await Auth().signInWithEmailAndPassword(
         email: controllerEmail.text,
         password: controllerPassword.text,
       );
-      saveGmail(controllerEmail.text);
-      checkReferenceDate();
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
         showSnackBar(errorMessage!);
+        isLoading = false; // Hide the circular progress indicator on error
       });
     }
+
+    setState(() {
+      isLoading = false; // Hide the circular progress indicator on success
+    });
   }
 
   /// CREATE USER
   Future<void> creatUserWithEmailAndPassword() async {
+    print("Auth class (Sign Up) *********");
+    saveGmail(controllerEmail.text);
+    checkReferenceDate();
     try {
       await Auth().createUserWithEmailAndPassowrd(
           email: controllerEmail.text, password: controllerPassword.text);
-      saveGmail(controllerEmail.text);
-      checkReferenceDate();
     } on FirebaseAuthException catch (e) {
       setState(() {
         errorMessage = e.message;
@@ -178,13 +193,25 @@ class _LoginPageState extends State<LoginPage> {
   /// the reference date should be set only once
   /// thus the app has to check wether the date has been set each time during login or setup to avoid setting up the reference date again
   /// getCurrentDate() function is called within this function
-  void checkReferenceDate() {
-    var localDatabase1 = Hive.box('Date3');
-    var localDatabase2 = Hive.box('Date6');
-    var localDatabase3 = Hive.box('Date12');
-    String referenceDate1 = localDatabase1.get('date');
-    String referenceDate2 = localDatabase2.get('date');
-    String referenceDate3 = localDatabase3.get('date');
+  void checkReferenceDate() async {
+    var localDatabase = Hive.box('Date');
+    bool containsKey1 = localDatabase.containsKey('date3');
+    bool containsKey2 = localDatabase.containsKey('date6');
+    bool containsKey3 = localDatabase.containsKey('date12');
+    print(containsKey1);
+    print(containsKey2);
+    print(containsKey3);
+    if (!containsKey1 && !containsKey2 && !containsKey3) {
+      localDatabase.put('date3', "");
+      localDatabase.put('date6', "");
+      localDatabase.put('date12', "");
+    }
+    String referenceDate1 = await localDatabase.get('date3');
+    String referenceDate2 = await localDatabase.get('date6');
+    String referenceDate3 = await localDatabase.get('date12');
+    print("***$referenceDate1");
+    print("***$referenceDate2");
+    print("***$referenceDate3");
     if (referenceDate1.isEmpty ||
         referenceDate2.isEmpty ||
         referenceDate3.isEmpty) {
@@ -197,20 +224,20 @@ class _LoginPageState extends State<LoginPage> {
 
   /// save current date to the database
   void saveReferenceDate_3(String referenceDate) {
-    var localDatabase = Hive.box('Date3');
-    localDatabase.put('date', referenceDate);
+    var localDatabase = Hive.box('Date');
+    localDatabase.put('date3', referenceDate);
   }
 
   /// save current date to the database
   void saveReferenceDate_6(String referenceDate) {
-    var localDatabase = Hive.box('Date6');
-    localDatabase.put('date', referenceDate);
+    var localDatabase = Hive.box('Date');
+    localDatabase.put('date6', referenceDate);
   }
 
   /// save current date to the database
   void saveReferenceDate_12(String referenceDate) {
-    var localDatabase = Hive.box('Date12');
-    localDatabase.put('date', referenceDate);
+    var localDatabase = Hive.box('Date');
+    localDatabase.put('date12', referenceDate);
   }
 
   @override
@@ -218,22 +245,60 @@ class _LoginPageState extends State<LoginPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: Center(
-        child: Container(
-          height: MediaQuery.of(context).size.height * 0.35,
-          width: MediaQuery.of(context).size.width * 0.8,
-          padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
-          decoration: BoxDecoration(
-              gradient: gradient,
-              borderRadius: const BorderRadius.all(Radius.circular(5))),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-            children: [
-              entryField("email", controllerEmail),
-              entryField("password", controllerPassword),
-              submitButton(),
-              loginOrRegister()
-            ],
-          ),
+        child: Center(
+          child: isLoading
+              ? Container(
+                  height: 100,
+                  width: 100,
+                  decoration: const BoxDecoration(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.all(Radius.circular(5))),
+                  child: Center(
+                    child: Stack(
+                      children: [
+                        Center(
+                          child: Container(
+                              height: MediaQuery.of(context).size.height * 0.1,
+                              width: MediaQuery.of(context).size.width * 0.2,
+                              decoration: const BoxDecoration(
+                                  color: Colors.transparent,
+                                  borderRadius:
+                                      BorderRadius.all(Radius.circular(5))),
+                              child: const CircularProgressIndicator(
+                                backgroundColor: Colors.orange,
+                                color: Colors.black,
+                              )),
+                        ),
+                        const Center(
+                            child: Positioned(
+                                child: Text(
+                          "LOGGING",
+                          style: TextStyle(
+                              color: Colors.black,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 11),
+                        )))
+                      ],
+                    ),
+                  ),
+                )
+              : Container(
+                  height: MediaQuery.of(context).size.height * 0.35,
+                  width: MediaQuery.of(context).size.width * 0.8,
+                  padding: const EdgeInsets.only(left: 10, right: 10, top: 5),
+                  decoration: BoxDecoration(
+                      gradient: gradient,
+                      borderRadius: const BorderRadius.all(Radius.circular(5))),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      entryField("email", controllerEmail),
+                      entryField("password", controllerPassword),
+                      submitButton(),
+                      loginOrRegister()
+                    ],
+                  ),
+                ),
         ),
       ),
     );

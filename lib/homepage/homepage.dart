@@ -254,7 +254,7 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the records of the user
   Widget records() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.53,
+      height: MediaQuery.of(context).size.height * 0.51,
       width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
@@ -302,7 +302,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.49,
+            height: MediaQuery.of(context).size.height * 0.47,
             width: MediaQuery.of(context).size.width * 1,
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ListView.builder(
@@ -396,7 +396,7 @@ class _HomePageState extends State<HomePage> {
         color: Colors.transparent,
       ),
       child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
           GestureDetector(
             onTap: () {
@@ -438,6 +438,7 @@ class _HomePageState extends State<HomePage> {
               ),
             ),
           ),
+          const SizedBox(width: 30),
           GestureDetector(
             onTap: () {
               Navigator.push(
@@ -493,7 +494,7 @@ class _HomePageState extends State<HomePage> {
                     ))));
       },
       child: Container(
-        height: MediaQuery.of(context).size.height * 0.08,
+        height: MediaQuery.of(context).size.height * 0.1,
         width: MediaQuery.of(context).size.width * 1,
         decoration: const BoxDecoration(
           color: Colors.transparent,
@@ -894,29 +895,32 @@ class _HomePageState extends State<HomePage> {
 
   /// fetch reference date
   void fetchReferenceDate_3() {
-    var localDatabase = Hive.box('Date3');
+    print("**************************");
+    var localDatabase = Hive.box('Date');
+    print("Reference date: ${localDatabase.get('date3')}");
     setState(() {
-      referenceDate_3 = localDatabase.get('date');
+      referenceDate_3 = localDatabase.get('date3');
     });
-    print("Reference date: ${localDatabase.get('date')}");
+    print("Reference date: ${localDatabase.get('date3')}");
+    print("**************************");
   }
 
   /// fetch reference date
   void fetchReferenceDate_6() {
-    var localDatabase = Hive.box('Date6');
+    var localDatabase = Hive.box('Date');
     setState(() {
-      referenceDate_6 = localDatabase.get('date');
+      referenceDate_6 = localDatabase.get('date6');
     });
-    print("Reference date: ${localDatabase.get('date')}");
+    print("Reference date: ${localDatabase.get('date6')}");
   }
 
   /// fetch reference date
   void fetchReferenceDate_12() {
-    var localDatabase = Hive.box('Date12');
+    var localDatabase = Hive.box('Date');
     setState(() {
-      referenceDate_12 = localDatabase.get('date');
+      referenceDate_12 = localDatabase.get('date12');
     });
-    print("Reference date: ${localDatabase.get('date')}");
+    print("Reference date: ${localDatabase.get('date12')}");
   }
 
   /// fetch today date
