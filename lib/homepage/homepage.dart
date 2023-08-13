@@ -40,6 +40,7 @@ class _HomePageState extends State<HomePage> {
   String userGmail = "";
 
   /// REFERENCE DATES
+  String referenceDate_1 = "";
   String referenceDate_3 = "";
   String referenceDate_6 = "";
   String referenceDate_12 = "";
@@ -58,21 +59,29 @@ class _HomePageState extends State<HomePage> {
   List sixMonthsData = [];
   List twelveMonthsData = [];
 
-  /// variables to store the start and end dates of the 3,6 and 12 months period
+  ///START | END DATES
+  String oneMonth_Start = "";
   String threeMonths_Start = "";
   String sixMonths_Start = "";
   String twelveMonths_Start = "";
+  String oneMonth_End = "";
   String threeMonths_End = "";
   String sixMonths_End = "";
   String twelveMonths_End = "";
 
   /// variable to store the report content, type of report that has been generated and the report periods
+  String reportType_ToDatabase_1 = "";
+  String reportPeriod_ToDatabase_1 = "";
+  List reportContent_ToDatabase_1 = [];
+
   String reportType_ToDatabase_3 = "";
   String reportPeriod_ToDatabase_3 = "";
   List reportContent_ToDatabase_3 = [];
+
   String reportType_ToDatabase_6 = "";
   String reportPeriod_ToDatabase_6 = "";
   List reportContent_ToDatabase_6 = [];
+
   String reportType_ToDatabase_12 = "";
   String reportPeriod_ToDatabase_12 = "";
   List reportContent_ToDatabase_12 = [];
@@ -364,12 +373,25 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-                                Text(
-                                  recordsTitles[index]["date"],
-                                  style: const TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.black,
-                                      fontWeight: FontWeight.w300),
+                                Row(
+                                  children: [
+                                    Text(
+                                      recordsTitles[index]["date"]
+                                          .substring(0, 10),
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w300),
+                                    ),
+                                    const SizedBox(width: 10),
+                                    Text(
+                                      "(${recordsTitles[index]["date"].substring(11)})",
+                                      style: const TextStyle(
+                                          fontSize: 14,
+                                          color: Colors.black,
+                                          fontWeight: FontWeight.w300),
+                                    ),
+                                  ],
                                 ),
                               ],
                             ),
@@ -546,6 +568,7 @@ class _HomePageState extends State<HomePage> {
     getCurrentMonthYear();
 
     /// REFERENCE DATE
+    fetchReferenceDate_1();
     fetchReferenceDate_3();
     fetchReferenceDate_6();
     fetchReferenceDate_12();
@@ -624,7 +647,7 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// function to get all the titles of the records
-  void getRecordTitles() {
+  void getRecordTitles() async {
     int count = 0;
     recordsTitles.clear();
     DatabaseReference databaseReference = FirebaseDatabase.instance
@@ -632,23 +655,15 @@ class _HomePageState extends State<HomePage> {
         .child("info")
         .child(removeSpecialCharacters(userGmail))
         .child("records");
-    databaseReference.onValue.listen((DatabaseEvent event) {
+    databaseReference.onValue.listen((DatabaseEvent event) async {
       for (var data in event.snapshot.children) {
-        List recordTitles_Child = [];
-        for (var data2 in data.children) {
-          setState(() {
-            recordTitles_Child.add(data2.value);
-            count = count + 1;
-          });
-        }
-        recordTitles_Child = recordTitles_Child.reversed.toList();
-        for (int x = 0; x < recordTitles_Child.length; x++) {
-          print(recordTitles_Child[x]);
-
-          recordsTitles.add(recordTitles_Child[x]);
-        }
+        setState(() {
+          recordsTitles.add(data.value);
+          count = count + 1;
+        });
       }
       recordsTitles = recordsTitles.reversed.toList();
+      print(recordsTitles);
 
       setState(() {
         recordsCount = count.toString();
@@ -726,6 +741,47 @@ class _HomePageState extends State<HomePage> {
         });
       }
     }
+  }
+
+  /// ONE month
+  void getReportContent_OneMonth(String startDate, String endDate) async {
+    /// Set period and dates
+    setState(() {
+      reportType_ToDatabase_1 = "1 Month";
+      reportPeriod_ToDatabase_1 = "( $startDate - $endDate)";
+    });
+
+    /// Generate the report
+    DatabaseReference databaseReference = FirebaseDatabase.instance
+        .ref()
+        .child("info")
+        .child(removeSpecialCharacters(userGmail));
+    databaseReference
+        .child("records")
+        .orderByChild('date')
+        .startAt(startDate)
+        .endAt(endDate)
+        .onValue
+        .listen((DatabaseEvent event) async {
+      if (event.snapshot.children.isEmpty) {
+        /// Do nothing
+      } else {
+        for (var data in event.snapshot.children) {
+          reportContent_ToDatabase_1.add(data.value);
+        }
+
+        /// record the  report
+        await databaseReference.child("reports").push().set({
+          "reportType": reportType_ToDatabase_1,
+          "reportPeriod": reportPeriod_ToDatabase_1,
+          "reportContent": reportContent_ToDatabase_1
+        });
+      }
+
+      /// Update reference date
+      var localDatabase = Hive.box('Date1');
+      localDatabase.put('date', endDate);
+    });
   }
 
   /// THREE months
@@ -849,9 +905,18 @@ class _HomePageState extends State<HomePage> {
 
   /// END dates
   void evaluateEndDates() {
+    evaluateOneEndDate();
     evaluateThreeEndDate();
     evaluateSixEndDate();
     evaluateTwelveEndDate();
+  }
+
+  /// ONE month
+  void evaluateOneEndDate() {
+    DateTime startDate = DateTime.parse(oneMonth_Start);
+    DateTime afterOneMonth = startDate.add(const Duration(days: 30));
+
+    oneMonth_End = DateFormat('yyyy-MM-dd').format(afterOneMonth);
   }
 
   /// THREE months
@@ -892,6 +957,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// fetch reference date
+  void fetchReferenceDate_1() {
+    var localDatabase = Hive.box('Date');
+    setState(() {
+      referenceDate_1 = localDatabase.get('date1');
+    });
+  }
+
+  /// fetch reference date
   void fetchReferenceDate_3() {
     var localDatabase = Hive.box('Date');
     setState(() {
@@ -920,12 +993,24 @@ class _HomePageState extends State<HomePage> {
     DateTime currentDate = DateTime.now();
     String currentMonth = currentDate.month.toString();
     String currentDay = currentDate.day.toString();
+    String currentHour = currentDate.hour.toString();
+    String currentMinute = currentDate.minute.toString();
+    String currentSecond = currentDate.second.toString();
+    String currentTime = "";
+    if (currentHour.length == 1) {
+      currentHour = "0$currentHour";
+    }
+    if (currentMinute.length == 1) {
+      currentMinute = "0$currentMinute";
+    }
     if (currentMonth.length == 1) {
       currentMonth = "0$currentMonth";
     }
     if (currentDay.length == 1) {
       currentDay = "0$currentDay";
     }
+    currentTime = "$currentHour:$currentMinute:$currentSecond";
+    print(currentTime);
     setState(() {
       todayDate = "${currentDate.year}-$currentMonth-$currentDay";
     });

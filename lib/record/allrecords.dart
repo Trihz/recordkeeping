@@ -87,12 +87,24 @@ class _AllRecordsState extends State<AllRecords> {
                               color: Colors.black,
                               fontWeight: FontWeight.w500),
                         ),
-                        Text(
-                          "( ${recordsDetails[index]["date"]} )",
-                          style: const TextStyle(
-                              fontSize: 15,
-                              color: Colors.black,
-                              fontWeight: FontWeight.w500),
+                        Row(
+                          children: [
+                            Text(
+                              "${recordsDetails[index]["date"].substring(0, 10)}",
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                            const SizedBox(width: 7),
+                            Text(
+                              "(${recordsDetails[index]["date"].substring(11)} )",
+                              style: const TextStyle(
+                                  fontSize: 15,
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.w300),
+                            ),
+                          ],
                         ),
                       ],
                     ),
@@ -173,18 +185,9 @@ class _AllRecordsState extends State<AllRecords> {
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
-        List recordTitles_Child = [];
-        for (var data2 in data.children) {
-          setState(() {
-            recordTitles_Child.add(data2.value);
-          });
-        }
-        recordTitles_Child = recordTitles_Child.reversed.toList();
-        for (int x = 0; x < recordTitles_Child.length; x++) {
-          print(recordTitles_Child[x]);
-
-          recordsDetails.add(recordTitles_Child[x]);
-        }
+        setState(() {
+          recordsDetails.add(data.value);
+        });
       }
 
       recordsDetails = recordsDetails.reversed.toList();

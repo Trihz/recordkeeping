@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_print, use_build_context_synchronously, prefer_const_constructors
+// ignore_for_file: avoid_print, use_build_context_synchronously, prefer_const_constructors, non_constant_identifier_names
 
 import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
@@ -29,7 +29,9 @@ class _RecordsState extends State<Records> {
   );
 
   /// variables to store the details concerning tyhe record
-  String recordDate = "SELECT DATE";
+  String recordDate = "";
+  String recordDateDisplay = "SELECT DATE";
+  String recordTimeDisplay = "";
   String recordTitle = "";
   String recordAmount = "";
   String recordDescription = "";
@@ -97,12 +99,25 @@ class _RecordsState extends State<Records> {
               ],
             ),
             child: Center(
-              child: Text(
-                recordDate,
-                style: const TextStyle(
-                    fontSize: 15,
-                    color: Colors.black,
-                    fontWeight: FontWeight.w600),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    recordDateDisplay,
+                    style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w500),
+                  ),
+                  const SizedBox(width: 10),
+                  Text(
+                    recordTimeDisplay,
+                    style: const TextStyle(
+                        fontSize: 15,
+                        color: Colors.black,
+                        fontWeight: FontWeight.w300),
+                  ),
+                ],
               ),
             ),
           ),
@@ -339,7 +354,7 @@ class _RecordsState extends State<Records> {
         .child("records");
 
     try {
-      await ref.child(recordDate).push().set({
+      await ref.child(recordDate).set({
         "date": recordDate,
         "title": recordTitle,
         "amount": recordAmount,
@@ -370,10 +385,16 @@ class _RecordsState extends State<Records> {
   /// function to format the datetime object
   void formatDate(String dateOuput) {
     DateTime dateTime = DateTime.parse(dateOuput);
+    DateTime time_now = DateTime.now();
     String formattedDate = DateFormat('yyyy-MM-dd').format(dateTime);
+    String currentTime = DateFormat('HH:mm:ss').format(time_now);
+
+    print(currentTime);
 
     setState(() {
-      recordDate = formattedDate;
+      recordDate = "$formattedDate $currentTime";
+      recordDateDisplay = recordDate.substring(0, 10);
+      recordTimeDisplay = "(${recordDate.substring(11)})";
     });
     print("Report date: $recordDate");
   }

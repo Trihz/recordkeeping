@@ -35,6 +35,7 @@ class _ReportsState extends State<Reports> {
   List fetchedReports = [];
 
   /// Integer variables to store the count of the reports depending in the month
+  int count1 = 0;
   int count3 = 0;
   int count6 = 0;
   int count12 = 0;
@@ -66,7 +67,43 @@ class _ReportsState extends State<Reports> {
             children: [
               Container(
                 height: MediaQuery.of(context).size.height * 0.08,
-                width: MediaQuery.of(context).size.width * 0.27,
+                width: MediaQuery.of(context).size.width * 0.2,
+                decoration: BoxDecoration(
+                    gradient: gradient,
+                    boxShadow: [
+                      BoxShadow(
+                        color: const Color.fromARGB(255, 156, 156, 156)
+                            .withOpacity(0.3),
+                        spreadRadius: 1,
+                        blurRadius: 1,
+                        offset:
+                            const Offset(0, 1), // changes position of shadow
+                      ),
+                    ],
+                    borderRadius: const BorderRadius.all(Radius.circular(5))),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    const Text(
+                      "1 Month",
+                      style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w400,
+                          fontSize: 15),
+                    ),
+                    Text(
+                      "(${count1.toString()})",
+                      style: const TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.w300,
+                          fontSize: 15),
+                    ),
+                  ],
+                ),
+              ),
+              Container(
+                height: MediaQuery.of(context).size.height * 0.08,
+                width: MediaQuery.of(context).size.width * 0.2,
                 decoration: BoxDecoration(
                     gradient: gradient,
                     boxShadow: [
@@ -102,7 +139,7 @@ class _ReportsState extends State<Reports> {
               ),
               Container(
                 height: MediaQuery.of(context).size.height * 0.08,
-                width: MediaQuery.of(context).size.width * 0.27,
+                width: MediaQuery.of(context).size.width * 0.2,
                 decoration: BoxDecoration(
                     gradient: gradient,
                     boxShadow: [
@@ -138,7 +175,7 @@ class _ReportsState extends State<Reports> {
               ),
               Container(
                 height: MediaQuery.of(context).size.height * 0.08,
-                width: MediaQuery.of(context).size.width * 0.27,
+                width: MediaQuery.of(context).size.width * 0.2,
                 decoration: BoxDecoration(
                     gradient: gradient,
                     boxShadow: [
@@ -321,20 +358,25 @@ class _ReportsState extends State<Reports> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height * 1,
-        width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-            topContainer(),
-            reportsDisplay()
-          ],
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          body: Container(
+            height: MediaQuery.of(context).size.height * 1,
+            width: MediaQuery.of(context).size.width * 1,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                topContainer(),
+                reportsDisplay()
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -358,7 +400,9 @@ class _ReportsState extends State<Reports> {
 
       /// Evaluate the counts
       for (int x = 0; x < fetchedReports.length; x++) {
-        if (fetchedReports[x]["reportType"] == "3 Months") {
+        if (fetchedReports[x]["reportType"] == "1 Month") {
+          count1++;
+        } else if (fetchedReports[x]["reportType"] == "3 Months") {
           count3++;
         } else if (fetchedReports[x]["reportType"] == "6 Months") {
           count6++;
@@ -367,6 +411,7 @@ class _ReportsState extends State<Reports> {
         }
         print(fetchedReports[x]["reportType"]);
       }
+      print(count1);
       print(count3);
       print(count6);
       print(count12);

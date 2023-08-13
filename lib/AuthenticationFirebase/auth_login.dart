@@ -42,7 +42,7 @@ class _LoginPageState extends State<LoginPage> {
     checkReferenceDate();
 
     setState(() {
-      isLoading = true; // Show the circular progress indicator
+      isLoading = true;
     });
 
     try {
@@ -261,6 +261,7 @@ class _LoginPageState extends State<LoginPage> {
       currentDay = "0$currentMonth";
     }
     String formattedDate = "${currentDate.year}-$currentMonth-$currentDay";
+    saveReferenceDate_1(formattedDate);
     saveReferenceDate_3(formattedDate);
     saveReferenceDate_6(formattedDate);
     saveReferenceDate_12(formattedDate);
@@ -273,24 +274,30 @@ class _LoginPageState extends State<LoginPage> {
   /// getCurrentDate() function is called within this function
   void checkReferenceDate() async {
     var localDatabase = Hive.box('Date');
+    bool containsKey0 = localDatabase.containsKey('date1');
     bool containsKey1 = localDatabase.containsKey('date3');
     bool containsKey2 = localDatabase.containsKey('date6');
     bool containsKey3 = localDatabase.containsKey('date12');
+    print(containsKey0);
     print(containsKey1);
     print(containsKey2);
     print(containsKey3);
-    if (!containsKey1 && !containsKey2 && !containsKey3) {
+    if (!containsKey0 && !containsKey1 && !containsKey2 && !containsKey3) {
+      localDatabase.put('date1', "");
       localDatabase.put('date3', "");
       localDatabase.put('date6', "");
       localDatabase.put('date12', "");
     }
+    String referenceDate0 = await localDatabase.get('date1');
     String referenceDate1 = await localDatabase.get('date3');
     String referenceDate2 = await localDatabase.get('date6');
     String referenceDate3 = await localDatabase.get('date12');
+    print("***$referenceDate0");
     print("***$referenceDate1");
     print("***$referenceDate2");
     print("***$referenceDate3");
-    if (referenceDate1.isEmpty ||
+    if (referenceDate0.isEmpty ||
+        referenceDate1.isEmpty ||
         referenceDate2.isEmpty ||
         referenceDate3.isEmpty) {
       getCurrentDate();
@@ -298,6 +305,12 @@ class _LoginPageState extends State<LoginPage> {
     } else {
       print("TRUE");
     }
+  }
+
+  /// save current date to the database
+  void saveReferenceDate_1(String referenceDate) {
+    var localDatabase = Hive.box('Date');
+    localDatabase.put('date1', referenceDate);
   }
 
   /// save current date to the database
