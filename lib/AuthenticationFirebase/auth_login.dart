@@ -1,7 +1,8 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, non_constant_identifier_names
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:hive/hive.dart';
 import 'package:recordkeeping/AuthenticationFirebase/auth.dart';
 
@@ -28,6 +29,8 @@ class _LoginPageState extends State<LoginPage> {
 
   String? errorMessage = '';
   bool isLogin = true;
+
+  bool isPasswordVisible = false;
 
   final TextEditingController controllerEmail = TextEditingController();
   final TextEditingController controllerPassword = TextEditingController();
@@ -85,14 +88,89 @@ class _LoginPageState extends State<LoginPage> {
       ),
       child: TextField(
         controller: controller,
+        style: const TextStyle(color: Colors.black),
         decoration: InputDecoration(
           hintText: title,
           hintStyle:
-              const TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
           border: const OutlineInputBorder(
             borderSide: BorderSide(
               color: Color.fromARGB(255, 255, 255, 255),
-              width: 1.0,
+              width: 0.5,
+            ),
+          ),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
+            ),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
+            ),
+          ),
+          disabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  /// TEXTFIELD PASSWORD
+  Widget entryField_Password(String title, TextEditingController controller) {
+    return Container(
+      height: MediaQuery.of(context).size.height * 0.06,
+      decoration: const BoxDecoration(
+        color: Colors.transparent,
+      ),
+      child: TextField(
+        controller: controller,
+        obscuringCharacter: "*",
+        obscureText: !isPasswordVisible,
+        style: const TextStyle(color: Colors.black),
+        decoration: InputDecoration(
+          suffixIcon: IconButton(
+            icon: Icon(
+              isPasswordVisible ? Icons.visibility : Icons.visibility_off,
+              color: const Color.fromARGB(255, 255, 255, 255),
+            ),
+            onPressed: () {
+              setState(() {
+                isPasswordVisible = !isPasswordVisible;
+              });
+            },
+          ),
+          hintText: title,
+          hintStyle:
+              const TextStyle(color: Colors.white, fontWeight: FontWeight.w300),
+          border: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
+            ),
+          ),
+          enabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
+            ),
+          ),
+          focusedBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
+            ),
+          ),
+          disabledBorder: const OutlineInputBorder(
+            borderSide: BorderSide(
+              color: Color.fromARGB(255, 255, 255, 255),
+              width: 0.5,
             ),
           ),
         ),
@@ -258,26 +336,13 @@ class _LoginPageState extends State<LoginPage> {
                       children: [
                         Center(
                           child: Container(
-                              height: MediaQuery.of(context).size.height * 0.1,
-                              width: MediaQuery.of(context).size.width * 0.2,
+                              height: 100,
+                              width: 100,
                               decoration: const BoxDecoration(
-                                  color: Colors.transparent,
-                                  borderRadius:
-                                      BorderRadius.all(Radius.circular(5))),
-                              child: const CircularProgressIndicator(
-                                backgroundColor: Colors.orange,
-                                color: Colors.black,
-                              )),
+                                  color: Colors.transparent),
+                              child: const SpinKitCircle(
+                                  color: Colors.orange, size: 100)),
                         ),
-                        const Center(
-                            child: Positioned(
-                                child: Text(
-                          "LOGGING",
-                          style: TextStyle(
-                              color: Colors.black,
-                              fontWeight: FontWeight.w600,
-                              fontSize: 11),
-                        )))
                       ],
                     ),
                   ),
@@ -293,7 +358,7 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                     children: [
                       entryField("email", controllerEmail),
-                      entryField("password", controllerPassword),
+                      entryField_Password("password", controllerPassword),
                       submitButton(),
                       loginOrRegister()
                     ],

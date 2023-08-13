@@ -1,11 +1,12 @@
 // ignore_for_file: non_constant_identifier_names, avoid_print, use_build_context_synchronously, must_be_immutable, prefer_typing_uninitialized_variables, unnecessary_brace_in_string_interps, unused_local_variable
 
+import 'dart:convert';
+
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 import 'package:intl/intl.dart';
-import 'package:recordkeeping/Account/account_ui.dart';
 import 'package:recordkeeping/calculator/calculator_ui.dart';
 import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/record/allrecords.dart';
@@ -82,25 +83,28 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the top contiainer
   Widget topContainer() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.22,
+      height: MediaQuery.of(context).size.height * 0.14,
       width: MediaQuery.of(context).size.width * 1,
+      margin: const EdgeInsets.only(left: 5, right: 5, top: 1, bottom: 3),
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
       child: Stack(
         children: [
           Container(
-            height: MediaQuery.of(context).size.height * 0.2,
+            height: MediaQuery.of(context).size.height * 0.12,
             width: MediaQuery.of(context).size.width * 1,
             decoration: BoxDecoration(
                 gradient: gradient,
                 borderRadius: const BorderRadius.only(
-                    bottomLeft: Radius.circular(40),
-                    bottomRight: Radius.circular(40))),
+                    bottomLeft: Radius.circular(10),
+                    bottomRight: Radius.circular(10),
+                    topLeft: Radius.circular(10),
+                    topRight: Radius.circular(10))),
             child: Column(
               children: [
                 SizedBox(
-                  height: MediaQuery.of(context).size.height * 0.09,
+                  height: MediaQuery.of(context).size.height * 0.01,
                 ),
                 accountIcon(),
                 SizedBox(
@@ -139,7 +143,7 @@ class _HomePageState extends State<HomePage> {
                         style: TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w300,
-                            fontSize: 16),
+                            fontSize: 14),
                       ),
                       const SizedBox(width: 10),
                       Text(
@@ -147,7 +151,7 @@ class _HomePageState extends State<HomePage> {
                         style: const TextStyle(
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
-                            fontSize: 18),
+                            fontSize: 16),
                       ),
                     ],
                   ),
@@ -155,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                       onTap: () {
                         getRecordTitles();
                       },
-                      child: GradientIcon(Icons.refresh, 30, gradient))
+                      child: GradientIcon(Icons.refresh, 25, gradient))
                 ],
               ),
             ),
@@ -168,7 +172,7 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the bottom container
   Widget bottomContainer() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.78,
+      height: MediaQuery.of(context).size.height * 0.75,
       width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
@@ -193,7 +197,7 @@ class _HomePageState extends State<HomePage> {
     return Container(
       height: MediaQuery.of(context).size.height * 0.06,
       width: MediaQuery.of(context).size.width * 1,
-      padding: const EdgeInsets.only(left: 30, right: 15),
+      padding: const EdgeInsets.only(left: 15, right: 15),
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -254,7 +258,7 @@ class _HomePageState extends State<HomePage> {
   /// widget to display the records of the user
   Widget records() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.51,
+      height: MediaQuery.of(context).size.height * 0.48,
       width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(color: Colors.transparent),
       child: Column(
@@ -271,7 +275,7 @@ class _HomePageState extends State<HomePage> {
                 const Text(
                   "Records",
                   style: TextStyle(
-                      fontSize: 19,
+                      fontSize: 17,
                       color: Colors.black,
                       fontWeight: FontWeight.w300),
                 ),
@@ -289,12 +293,12 @@ class _HomePageState extends State<HomePage> {
                       const Text(
                         "View",
                         style: TextStyle(
-                            fontSize: 17,
+                            fontSize: 14,
                             color: Colors.black,
                             fontWeight: FontWeight.w400),
                       ),
                       const SizedBox(width: 5),
-                      GradientIcon(Icons.view_comfy_alt, 25, gradient)
+                      GradientIcon(Icons.view_comfy_alt, 20, gradient)
                     ],
                   ),
                 )
@@ -302,10 +306,12 @@ class _HomePageState extends State<HomePage> {
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.47,
+            height: MediaQuery.of(context).size.height * 0.44,
             width: MediaQuery.of(context).size.width * 1,
+            padding: const EdgeInsets.only(bottom: 10),
             decoration: const BoxDecoration(color: Colors.transparent),
             child: ListView.builder(
+                reverse: false,
                 itemCount: recordsTitles.length,
                 padding: const EdgeInsets.all(20),
                 scrollDirection: Axis.vertical,
@@ -352,7 +358,7 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       recordsTitles[index]["title"],
                                       style: const TextStyle(
-                                          fontSize: 16,
+                                          fontSize: 14,
                                           color: Colors.black,
                                           fontWeight: FontWeight.w400),
                                     ),
@@ -361,17 +367,17 @@ class _HomePageState extends State<HomePage> {
                                 Text(
                                   recordsTitles[index]["date"],
                                   style: const TextStyle(
-                                      fontSize: 16,
+                                      fontSize: 14,
                                       color: Colors.black,
                                       fontWeight: FontWeight.w300),
                                 ),
                               ],
                             ),
-                            SizedBox(height: 5),
+                            const SizedBox(height: 5),
                             Text(
-                              "(Ksh ${recordsTitles[index]["amount"]})",
+                              "Ksh ${recordsTitles[index]["amount"]}",
                               style: const TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 14,
                                   color: Colors.black,
                                   fontWeight: FontWeight.w300),
                             ),
@@ -390,8 +396,9 @@ class _HomePageState extends State<HomePage> {
   /// stats container
   Widget statsContainer() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.12,
+      height: MediaQuery.of(context).size.height * 0.1,
       width: MediaQuery.of(context).size.width * 0.95,
+      margin: const EdgeInsets.only(top: 8),
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
@@ -416,13 +423,13 @@ class _HomePageState extends State<HomePage> {
                   boxShadow: [
                     BoxShadow(
                       color: const Color.fromARGB(255, 99, 99, 99)
-                          .withOpacity(0.2),
+                          .withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 1,
                       offset: const Offset(0, 1), // changes position of shadow
                     ),
                   ],
-                  borderRadius: const BorderRadius.all(Radius.circular(10))),
+                  borderRadius: const BorderRadius.all(Radius.circular(5))),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -455,13 +462,13 @@ class _HomePageState extends State<HomePage> {
                   boxShadow: [
                     BoxShadow(
                       color: const Color.fromARGB(255, 99, 99, 99)
-                          .withOpacity(0.2),
+                          .withOpacity(0.1),
                       spreadRadius: 1,
                       blurRadius: 1,
                       offset: const Offset(0, 1), // changes position of shadow
                     ),
                   ],
-                  borderRadius: const BorderRadius.all(Radius.circular(10))),
+                  borderRadius: const BorderRadius.all(Radius.circular(5))),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
@@ -538,14 +545,10 @@ class _HomePageState extends State<HomePage> {
     /// CURRENT MONTH & YEAR
     getCurrentMonthYear();
 
-    print("**************************");
-
     /// REFERENCE DATE
     fetchReferenceDate_3();
     fetchReferenceDate_6();
     fetchReferenceDate_12();
-
-    print("**************************");
 
     /// TODAY DATE
     fetchTodayDate();
@@ -572,16 +575,21 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: Container(
-      height: MediaQuery.of(context).size.height * 1,
-      width: MediaQuery.of(context).size.width * 1,
-      decoration: const BoxDecoration(color: Colors.white),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: [topContainer(), bottomContainer()],
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+            body: Container(
+          height: MediaQuery.of(context).size.height * 1,
+          width: MediaQuery.of(context).size.width * 1,
+          decoration: const BoxDecoration(color: Colors.white),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+            children: [topContainer(), bottomContainer()],
+          ),
+        )),
       ),
-    ));
+    );
   }
 
   /// List to store the elements of the scrolling dates
@@ -626,16 +634,25 @@ class _HomePageState extends State<HomePage> {
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
-        setState(() {
-          recordsTitles.add(data.value);
-          count = count + 1;
-        });
+        List recordTitles_Child = [];
+        for (var data2 in data.children) {
+          setState(() {
+            recordTitles_Child.add(data2.value);
+            count = count + 1;
+          });
+        }
+        recordTitles_Child = recordTitles_Child.reversed.toList();
+        for (int x = 0; x < recordTitles_Child.length; x++) {
+          print(recordTitles_Child[x]);
+
+          recordsTitles.add(recordTitles_Child[x]);
+        }
       }
+      recordsTitles = recordsTitles.reversed.toList();
+
       setState(() {
         recordsCount = count.toString();
       });
-      print(recordsTitles[0]["title"]);
-      print(recordsTitles[1]["title"]);
     });
   }
 
@@ -645,8 +662,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       numberOfDays_CurrentMonth = daysInMonth(now);
     });
-    print(numberOfDays_CurrentMonth);
-    print(daysInMonth(now));
   }
 
   int daysInMonth(DateTime date) {
@@ -670,7 +685,6 @@ class _HomePageState extends State<HomePage> {
     /// clear the filtered data variable
     filteredData.clear();
     //recordData.clear();
-    print("Before: $filteredData");
 
     /// get current month and date first
     getCurrentMonthYear();
@@ -689,7 +703,6 @@ class _HomePageState extends State<HomePage> {
 
     /// format the date for querying purpose
     formattedDate = "$year-$month-$dateClicked";
-    print(formattedDate);
 
     /// database operation
     DatabaseReference databaseReference = FirebaseDatabase.instance
@@ -703,6 +716,7 @@ class _HomePageState extends State<HomePage> {
           recordData.add(data.value);
         });
       }
+      print(recordData);
     });
     for (int x = 0; x < recordData.length; x++) {
       recordDate_Filtering = recordData[x]["date"];
@@ -712,7 +726,6 @@ class _HomePageState extends State<HomePage> {
         });
       }
     }
-    print("After: $filteredData");
   }
 
   /// THREE months
@@ -736,13 +749,10 @@ class _HomePageState extends State<HomePage> {
         .onValue
         .listen((DatabaseEvent event) async {
       if (event.snapshot.children.isEmpty) {
-        print("No data for this period");
       } else {
         for (var data in event.snapshot.children) {
           reportContent_ToDatabase_3.add(data.value);
         }
-        print("Report content: ${reportContent_ToDatabase_3}");
-        print(reportContent_ToDatabase_3[0]["date"]);
 
         /// record the  report
         await databaseReference.child("reports").push().set({
@@ -779,13 +789,10 @@ class _HomePageState extends State<HomePage> {
         .onValue
         .listen((DatabaseEvent event) async {
       if (event.snapshot.children.isEmpty) {
-        print("No data for this period");
       } else {
         for (var data in event.snapshot.children) {
           reportContent_ToDatabase_6.add(data.value);
         }
-        print("Report content: ${reportContent_ToDatabase_6}");
-        print(reportContent_ToDatabase_6[0]["date"]);
 
         /// record the  report
         await databaseReference.child("reports").push().set({
@@ -822,13 +829,10 @@ class _HomePageState extends State<HomePage> {
         .onValue
         .listen((DatabaseEvent event) async {
       if (event.snapshot.children.isEmpty) {
-        print("No data for this period");
       } else {
         for (var data in event.snapshot.children) {
           reportContent_ToDatabase_12.add(data.value);
         }
-        print("Report content: ${reportContent_ToDatabase_12}");
-        print(reportContent_ToDatabase_12[0]["date"]);
 
         /// record the  report
         await databaseReference.child("reports").push().set({
@@ -856,8 +860,6 @@ class _HomePageState extends State<HomePage> {
     DateTime afterThreeMonths = startDate.add(const Duration(days: 3 * 30));
 
     threeMonths_End = DateFormat('yyyy-MM-dd').format(afterThreeMonths);
-    print(threeMonths_Start);
-    print(threeMonths_End);
   }
 
   /// SIX months
@@ -866,8 +868,6 @@ class _HomePageState extends State<HomePage> {
     DateTime afterSixMonths = startDate.add(const Duration(days: 6 * 30));
 
     sixMonths_End = DateFormat('yyyy-MM-dd').format(afterSixMonths);
-    print(sixMonths_Start);
-    print(sixMonths_End);
   }
 
   /// TWELVE months
@@ -876,8 +876,6 @@ class _HomePageState extends State<HomePage> {
     DateTime afterTwelveMonths = startDate.add(const Duration(days: 365));
 
     twelveMonths_End = DateFormat('yyyy-MM-dd').format(afterTwelveMonths);
-    print(twelveMonths_Start);
-    print(twelveMonths_End);
   }
 
   /// Sign out
@@ -891,19 +889,14 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       userGmail = localDatabase.get('gmail');
     });
-    print('Name: $userGmail');
   }
 
   /// fetch reference date
   void fetchReferenceDate_3() {
-    print("**************************");
     var localDatabase = Hive.box('Date');
-    print("Reference date: ${localDatabase.get('date3')}");
     setState(() {
       referenceDate_3 = localDatabase.get('date3');
     });
-    print("Reference date: ${localDatabase.get('date3')}");
-    print("**************************");
   }
 
   /// fetch reference date
@@ -912,7 +905,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       referenceDate_6 = localDatabase.get('date6');
     });
-    print("Reference date: ${localDatabase.get('date6')}");
   }
 
   /// fetch reference date
@@ -921,7 +913,6 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       referenceDate_12 = localDatabase.get('date12');
     });
-    print("Reference date: ${localDatabase.get('date12')}");
   }
 
   /// fetch today date
@@ -938,16 +929,10 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       todayDate = "${currentDate.year}-$currentMonth-$currentDay";
     });
-    print(todayDate);
   }
 
   /// compare today's date and the end date
   void reportDatesComparison() {
-    print("End date(3): ${threeMonths_End}");
-    print("End date(6): ${sixMonths_End}");
-    print("End date(12): ${twelveMonths_End}");
-    print("Today's date: ${todayDate}");
-
     // YEAR,MONTH,DAY
     int year_today = int.parse(todayDate.substring(0, 4));
     int month_today = int.parse(todayDate.substring(5, 7));

@@ -1,4 +1,4 @@
-// ignore_for_file: must_be_immutable, avoid_print
+// ignore_for_file: must_be_immutable, avoid_print, non_constant_identifier_names
 
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
@@ -46,7 +46,7 @@ class _AllRecordsState extends State<AllRecords> {
   Widget recordsDisplay() {
     return Container(
       height: MediaQuery.of(context).size.height * 0.85,
-      width: MediaQuery.of(context).size.width * 0.95,
+      width: MediaQuery.of(context).size.width * 1,
       decoration: const BoxDecoration(
         color: Colors.transparent,
       ),
@@ -100,7 +100,7 @@ class _AllRecordsState extends State<AllRecords> {
                     Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        "(Ksh ${recordsDetails[index]["amount"]})",
+                        "Ksh ${recordsDetails[index]["amount"]}",
                         style: const TextStyle(
                             wordSpacing: 2,
                             fontSize: 15,
@@ -137,20 +137,25 @@ class _AllRecordsState extends State<AllRecords> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        height: MediaQuery.of(context).size.height * 1,
-        width: MediaQuery.of(context).size.width * 1,
-        decoration: const BoxDecoration(
-          color: Colors.white,
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-          children: [
-            SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-            topContainer(),
-            recordsDisplay()
-          ],
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: Scaffold(
+          body: Container(
+            height: MediaQuery.of(context).size.height * 1,
+            width: MediaQuery.of(context).size.width * 1,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+              children: [
+                SizedBox(height: MediaQuery.of(context).size.height * 0.01),
+                topContainer(),
+                recordsDisplay()
+              ],
+            ),
+          ),
         ),
       ),
     );
@@ -168,10 +173,21 @@ class _AllRecordsState extends State<AllRecords> {
         .child("records");
     databaseReference.onValue.listen((DatabaseEvent event) {
       for (var data in event.snapshot.children) {
-        setState(() {
-          recordsDetails.add(data.value);
-        });
+        List recordTitles_Child = [];
+        for (var data2 in data.children) {
+          setState(() {
+            recordTitles_Child.add(data2.value);
+          });
+        }
+        recordTitles_Child = recordTitles_Child.reversed.toList();
+        for (int x = 0; x < recordTitles_Child.length; x++) {
+          print(recordTitles_Child[x]);
+
+          recordsDetails.add(recordTitles_Child[x]);
+        }
       }
+
+      recordsDetails = recordsDetails.reversed.toList();
       print(recordsDetails);
       print(recordsDetails[0]["title"]);
       print(recordsDetails[0]["description"]);

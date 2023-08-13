@@ -1,8 +1,10 @@
-// ignore_for_file: avoid_print
+// ignore_for_file: avoid_print, use_build_context_synchronously, prefer_const_constructors
 
+import 'package:blurry_modal_progress_hud/blurry_modal_progress_hud.dart';
 import 'package:calendar_date_picker2/calendar_date_picker2.dart';
 import 'package:firebase_database/firebase_database.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:recordkeeping/gradient/gradient_class.dart';
 import 'package:recordkeeping/homepage/homepage.dart';
 import 'package:intl/intl.dart';
@@ -32,44 +34,38 @@ class _RecordsState extends State<Records> {
   String recordAmount = "";
   String recordDescription = "";
 
+  /// STATUS VARIABLE
+  bool isSaving = false;
+
   /// show the calendar
   Widget showCalendar() {
     return Container(
-      height: MediaQuery.of(context).size.height * 0.4,
-      width: MediaQuery.of(context).size.width * 0.99,
+      height: MediaQuery.of(context).size.height * 0.32,
+      width: MediaQuery.of(context).size.width * 1,
+      margin: const EdgeInsets.only(top: 5, left: 5, right: 5, bottom: 5),
+      padding: const EdgeInsets.all(4),
       decoration: BoxDecoration(
           gradient: gradient,
           borderRadius: const BorderRadius.only(
               bottomLeft: Radius.circular(10),
-              bottomRight: Radius.circular(10))),
-      child: Column(
-        children: [
-          SizedBox(height: MediaQuery.of(context).size.height * 0.08),
-          Container(
-              height: MediaQuery.of(context).size.height * 0.32,
-              width: MediaQuery.of(context).size.width * 1,
-              decoration: const BoxDecoration(
-                color: Colors.transparent,
-              ),
-              child: CalendarDatePicker2(
-                config: CalendarDatePicker2Config(
-                    dayTextStyle: const TextStyle(color: Colors.white),
-                    selectedDayHighlightColor: Colors.black,
-                    selectedDayTextStyle: const TextStyle(
-                        fontWeight: FontWeight.w600, color: Colors.black),
-                    todayTextStyle: const TextStyle(
-                        color: Colors.black,
-                        fontWeight: FontWeight.w600,
-                        fontSize: 12),
-                    controlsTextStyle: const TextStyle(
-                        color: Colors.black, fontWeight: FontWeight.w600)),
-                value: [],
-                onValueChanged: (value) {
-                  formatDate(value[0].toString());
-                  print(value);
-                },
-              )),
-        ],
+              bottomRight: Radius.circular(10),
+              topLeft: Radius.circular(10),
+              topRight: Radius.circular(10))),
+      child: CalendarDatePicker2(
+        config: CalendarDatePicker2Config(
+            dayTextStyle: const TextStyle(color: Colors.white, fontSize: 11),
+            selectedDayHighlightColor: Colors.black,
+            selectedDayTextStyle: const TextStyle(
+                fontWeight: FontWeight.w600, color: Colors.black, fontSize: 11),
+            todayTextStyle: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w600, fontSize: 11),
+            controlsTextStyle: const TextStyle(
+                color: Colors.black, fontWeight: FontWeight.w600)),
+        value: [],
+        onValueChanged: (value) {
+          formatDate(value[0].toString());
+          print(value);
+        },
       ),
     );
   }
@@ -122,35 +118,42 @@ class _RecordsState extends State<Records> {
                   recordTitle = value;
                 });
               },
-              decoration: const InputDecoration(
-                icon: Icon(
-                  Icons.title_sharp,
-                  color: Colors.black,
-                  size: 25,
-                ),
-                hintText: "Title",
-                contentPadding: EdgeInsets.all(10.0),
-                hintStyle:
-                    TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
-                border: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
-                    width: 0.5,
+              decoration: InputDecoration(
+                  icon: Container(
+                      height: MediaQuery.of(context).size.height * 0.05,
+                      width: MediaQuery.of(context).size.width * 0.1,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Image.asset("assets/record_title.png")),
+                  hintText: "Title",
+                  contentPadding: const EdgeInsets.all(10.0),
+                  hintStyle: const TextStyle(
+                      color: Colors.black, fontWeight: FontWeight.w300),
+                  border: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 165, 165, 165),
+                      width: 0.5,
+                    ),
                   ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
-                    width: 0.5,
+                  enabledBorder: const OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 165, 165, 165),
+                      width: 0.5,
+                    ),
                   ),
-                ),
-                enabledBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
-                    width: 0.5,
+                  focusedBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 165, 165, 165),
+                      width: 0.5,
+                    ),
                   ),
-                ),
-              ),
+                  disabledBorder: OutlineInputBorder(
+                    borderSide: BorderSide(
+                      color: Color.fromARGB(255, 165, 165, 165),
+                      width: 0.5,
+                    ),
+                  )),
             ),
           ),
           Container(
@@ -165,31 +168,39 @@ class _RecordsState extends State<Records> {
                   recordAmount = value;
                 });
               },
-              decoration: const InputDecoration(
-                icon: Icon(
-                  Icons.price_check,
-                  color: Colors.black,
-                  size: 25,
-                ),
+              decoration: InputDecoration(
+                icon: Container(
+                    height: MediaQuery.of(context).size.height * 0.05,
+                    width: MediaQuery.of(context).size.width * 0.1,
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                    ),
+                    child: Image.asset("assets/currency.jpg")),
                 hintText: "Amount",
                 contentPadding: EdgeInsets.all(10.0),
                 hintStyle:
                     TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
-                border: OutlineInputBorder(
+                border: const OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
+                    color: Color.fromARGB(255, 165, 165, 165),
                     width: 0.5,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
+                    color: Color.fromARGB(255, 165, 165, 165),
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 165, 165, 165),
+                    width: 0.5,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 165, 165, 165),
                     width: 0.5,
                   ),
                 ),
@@ -197,7 +208,7 @@ class _RecordsState extends State<Records> {
             ),
           ),
           Container(
-            height: MediaQuery.of(context).size.height * 0.3,
+            height: MediaQuery.of(context).size.height * 0.27,
             width: MediaQuery.of(context).size.width * 0.9,
             decoration: const BoxDecoration(
               color: Colors.white,
@@ -216,19 +227,25 @@ class _RecordsState extends State<Records> {
                     TextStyle(color: Colors.black, fontWeight: FontWeight.w300),
                 border: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
-                    width: 0.5,
-                  ),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
+                    color: Color.fromARGB(255, 165, 165, 165),
                     width: 0.5,
                   ),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderSide: BorderSide(
-                    color: Color.fromARGB(255, 126, 126, 126),
+                    color: Color.fromARGB(255, 165, 165, 165),
+                    width: 0.5,
+                  ),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 165, 165, 165),
+                    width: 0.5,
+                  ),
+                ),
+                disabledBorder: OutlineInputBorder(
+                  borderSide: BorderSide(
+                    color: Color.fromARGB(255, 165, 165, 165),
                     width: 0.5,
                   ),
                 ),
@@ -272,19 +289,40 @@ class _RecordsState extends State<Records> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SingleChildScrollView(
-        child: Container(
-          height: MediaQuery.of(context).size.height * 1,
-          width: MediaQuery.of(context).size.width * 1,
-          decoration: const BoxDecoration(
-            color: Colors.white,
+    return Container(
+      color: Colors.white,
+      child: SafeArea(
+        child: BlurryModalProgressHUD(
+          progressIndicator: const SpinKitFadingCircle(
+            color: Colors.orange,
+            size: 90.0,
           ),
-          child: Column(children: [
-            showCalendar(),
-            operationsRecording(),
-            recordButton()
-          ]),
+          inAsyncCall: isSaving,
+          child: Scaffold(
+            body: Container(
+              height: MediaQuery.of(context).size.height * 1,
+              width: MediaQuery.of(context).size.width * 1,
+              decoration: const BoxDecoration(
+                color: Colors.white,
+              ),
+              child: Column(children: [
+                showCalendar(),
+                Expanded(
+                  child: SingleChildScrollView(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 1,
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                      ),
+                      child: Column(
+                        children: [operationsRecording(), recordButton()],
+                      ),
+                    ),
+                  ),
+                ),
+              ]),
+            ),
+          ),
         ),
       ),
     );
@@ -292,17 +330,36 @@ class _RecordsState extends State<Records> {
 
   /// method  to save the record details
   void saveRecordsData() async {
+    setState(() {
+      isSaving = true;
+    });
     DatabaseReference ref = FirebaseDatabase.instance
         .ref("info")
         .child(removeSpecialCharacters(widget.userGmail))
         .child("records");
 
-    await ref.child(recordDate).set({
-      "date": recordDate,
-      "title": recordTitle,
-      "amount": recordAmount,
-      "description": recordDescription
-    });
+    try {
+      await ref.child(recordDate).push().set({
+        "date": recordDate,
+        "title": recordTitle,
+        "amount": recordAmount,
+        "description": recordDescription
+      });
+      await Future.delayed(const Duration(seconds: 5));
+      setState(() {
+        isSaving = false;
+      });
+
+      Navigator.push(
+          context, MaterialPageRoute(builder: ((context) => const HomePage())));
+    } catch (error) {
+      print("Error saving data: $error");
+      await Future.delayed(const Duration(seconds: 5));
+      setState(() {
+        isSaving = false;
+      });
+      showSnackBar("An error occurred while saving data");
+    }
   }
 
   String removeSpecialCharacters(String input) {
@@ -341,7 +398,7 @@ class _RecordsState extends State<Records> {
                     style: TextStyle(
                         color: Colors.black,
                         fontWeight: FontWeight.w400,
-                        fontSize: 16),
+                        fontSize: 14),
                   ),
                   GradientIcon(
                       Icons.check_circle_outline_rounded, 50, gradient),
@@ -355,13 +412,16 @@ class _RecordsState extends State<Records> {
 
   /// function to check whether all the details have been entered as required
   void checkEntryOfDetails() {
-    if (recordDate == "SELECT DATE" ||
-        recordTitle.isEmpty ||
-        recordDescription.isEmpty) {
-      showSnackBar("Please enter all details");
+    if (recordDate == "SELECT DATE") {
+      showSnackBar("Please the select date");
     } else {
-      saveRecordsData();
-      success(context);
+      if (recordTitle.isEmpty ||
+          recordDescription.isEmpty ||
+          recordAmount.isEmpty) {
+        showSnackBar("Please enter all details");
+      } else {
+        saveRecordsData();
+      }
     }
   }
 
